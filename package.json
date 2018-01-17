@@ -1,0 +1,23 @@
+{
+  "name": "ReittiTele",
+  "version": "1.0.0",
+  "description": "Projekti on testaus telegramin ja reittioppaan apin testaukseen.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Acleaust/ReittiTele.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Acleaust/ReittiTele/issues"
+  },
+  "homepage": "https://github.com/Acleaust/ReittiTele#readme",
+  "dependencies": {
+    "telebot": "^1.2.3"
+  }
+}
