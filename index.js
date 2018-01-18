@@ -1,6 +1,6 @@
 const TeleBot = require('telebot');
 const bot = new TeleBot('BotToken'); //'BotToken'
-const { request } = require('graphql-request')
+require('isomorphic-fetch');
 
 //
 
@@ -13,26 +13,21 @@ bot.on('text', msg => {
     let id = msg.from.id;
     let text = msg.text;
 
-    const query = `{
-        stops(name: "${ text }") {
-            id
-            name
-            wheelchairBoarding
-        }
-      }`
-        
-      request('http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql', query).then(data => console.log(data))
-    
-      if(){
-        
-      }
+    fetch('http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: `{
+            stops(name: "${ text }") {
+                id
+                name
+            }
+          }` }),
+      })
+        .then(res => res.json())
+        .then(res => console.log(res.data));
 
     return bot.sendMessage(id, `Pysäkkiä "${ text }" ei löydy xd`);
 
 });
 
-
 bot.start();
-
-
-
