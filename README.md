@@ -1,3 +1,3 @@
 # ReittiTele
 
-Projekti on testaus telegramin ja reittioppaan apin testaukseen.
+Projekti on testaus telegramin ja reittioppaan apin testaukseen ja kaikkee muutakin sähläystä API:en ja noden käyttöön...
