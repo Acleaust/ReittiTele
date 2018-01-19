@@ -1,0 +1,26 @@
+{
+  "name": "reittitele",
+  "version": "1.0.0",
+  "description": "Projekti on testaus telegramin ja reittioppaan apin testaukseen ja kaikkee muutakin sähläystä API:en ja noden käyttöön...",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Acleaust/ReittiTele.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Acleaust/ReittiTele/issues"
+  },
+  "homepage": "https://github.com/Acleaust/ReittiTele#readme",
+  "dependencies": {
+    "es6-promise": "^4.2.2",
+    "graphql-request": "^1.4.1",
+    "gtfs-realtime-bindings": "0.0.4",
+    "isomorphic-fetch": "^2.2.1",
+    "telebot": "^1.2.3"
+  }
+}
