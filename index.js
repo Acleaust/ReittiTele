@@ -2,7 +2,6 @@ const TeleBot = require('telebot');
 const bot = new TeleBot('503339568:AAG2TQSzCCnSaxhZrRbO08rUo8dRtjmbmT0'); //'BotToken'
 const { request } = require('graphql-request')
 
-
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 const vaaravastaus = '{"stops":[]}'
@@ -10,7 +9,7 @@ const vaaravastaus = '{"stops":[]}'
 
 //Komentoja
 bot.on('/start', (msg) => {
-    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia! Botti on tällä hetkellä work in progress joten toiminnallisuus on mitä on. Voit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: E4017).`); //Vastaa kun käyttäjä käyttää /start komentoa
+return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia! Botti on tällä hetkellä kesken, joten toiminnallisuutta ei vielä ole.\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 //Koko muu höskä
@@ -19,7 +18,7 @@ bot.on('text', msg => {
     let id = msg.from.id;
     let text = msg.text;
 
-    // /start ei tee pysäkkihakua
+    // Tähän komennot joita jotka ei tee pysäkkihakua
     if (text == "/start") {
         //Älä tee mitään
     } else {
@@ -42,13 +41,45 @@ bot.on('text', msg => {
                 if(vastaus == vaaravastaus) {
                     return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
                 }else{
-                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}". Vastaus: ${vastaus}`);
+                    console.log("----")
+                    console.log("Vastaus: " + vastaus)
+                    console.log("----")
 
-                    //Tähän for looppi joka tekee napin jokaisesta vastauksesta
+                    /* Tää oli joku random testi pidän sen täs jos sitä voi käytää hyväks
+                    for(stops in data) {
+                        var vastaus = JSON.stringify(data[stops])
+                        console.log(vastaus)
+                    }
+                    */
+
+                    //Tähän for looppi joka tekee napin jokaisesta pysäkin nimestä telegramiin
+
+                    //Keyboard (Button) test. Tätä voi käyttää hyväks siihen for looppiin...
+                    let replyMarkup = bot.keyboard([
+                        ['/start'],
+                        ['/hide']
+                    ], {resize: true});
+
+                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n${vastaus}`, {replyMarkup} );
+                    
+
+                    /*
+                    for(name in data) {
+                        console.log(JSON.stringify(data[name]))
+                    }*/
+
+                    
             }
         })           
     }
 })
+
+//Viesti /hide - piilottaa keyboardin
+bot.on('/hide', msg => {
+    return bot.sendMessage(
+        msg.from.id, 'Pysäkkivaihtoehdot piilotettu', {replyMarkup: 'hide'}
+    );
+});
 
 // Logaa jokaisen viestin consoliin
 bot.on('text', function (msg) {
