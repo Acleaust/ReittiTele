@@ -1,3 +1,3 @@
 # ReittiTele
 
-Projekti on testaus telegramin ja digitransitin APIn testaukseen ja kaikkee muutakin sähläystä APIen ja noden käyttöön. Todennäköisesti et tule löytämään mitään kiinnostavaa täältä...
+Projekti on testaus Telegramin bot platformiin ja Digitransitin API:n käyttöön. Sisältää paljon sähläystä.
