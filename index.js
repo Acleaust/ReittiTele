@@ -51,6 +51,10 @@ bot.on('text', msg => {
                         console.log(vastaus)
                     }
                     */
+                    /* Toinen random testi
+                    for(name in data) {
+                        console.log(JSON.stringify(data[name]))
+                    }*/
 
                     //Tähän for looppi joka tekee napin jokaisesta pysäkin nimestä telegramiin
 
@@ -61,13 +65,6 @@ bot.on('text', msg => {
                     ], {resize: true});
 
                     return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n${vastaus}`, {replyMarkup} );
-                    
-
-                    /*
-                    for(name in data) {
-                        console.log(JSON.stringify(data[name]))
-                    }*/
-
                     
             }
         })           
