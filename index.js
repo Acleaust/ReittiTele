@@ -1,5 +1,5 @@
 const TeleBot = require('telebot');
-const bot = new TeleBot('421446760:AAHVNT3llWsGwbS9lCIFs1LLnJ1NZCyy3SE'); //'BotToken'
+const bot = new TeleBot('503339568:AAHJA_cqsBgQ3EbXXbltmdaiW0QPrsxXOpI'); //'BotToken'
 const { request } = require('graphql-request')
 
 //Muuttujat
@@ -9,7 +9,7 @@ const vaaravastaus = '{"stops":[]}'
 
 //Komentoja
 bot.on('/start', (msg) => {
-return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia! Botti on tällä hetkellä kesken, joten toiminnallisuutta ei vielä ole.\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").`); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia! Botti on tällä hetkellä kesken, joten toiminnallisuutta ei vielä ole.\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 //Koko muu höskä
@@ -38,43 +38,59 @@ bot.on('text', msg => {
                 console.log(data)
                 var vastaus = JSON.stringify(data);
 
-                if(vastaus == vaaravastaus) {
+                if (vastaus == vaaravastaus) {
                     return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
-                }else{
+                } else {
                     console.log("----")
                     console.log("Vastaus: " + vastaus)
                     console.log("----")
-              
-                    
-                
-                    /* Toinen random testi
-                    for(name in data) {
-                        console.log(JSON.stringify(data[name]))
-                    }*/
+
+
+
+                    // Toinen random testi
+
+
 
                     var jp = require('jsonpath');
                     var pysakit = jp.query(data, '$..name');
                     var koodit = jp.query(data, '$..code')
+                   
+                    console.log(pysakit.join(" "));
+                    // pysakit.forEach(function(value){
+                   
+                        
+                        for (i = 0; i < pysakit.length; i += 1) {
+                               // var k = koodit[i++];
+                     // var  koodijapys = e+" "+k;
 
-                    //Tähän for looppi joka tekee napin jokaisesta pysäkin nimestä telegramiin
+                       // console.log(koodijapys);
+                       console.log(pysakit[i]+" "+koodit[i]);
+                }
+                }
 
-                    //Keyboard (Button) test. Tätä voi käyttää hyväks siihen for looppiin...
-                    let replyMarkup = bot.keyboard([
-                        ['/start'],
-                        ['/hide']
-                    ], {resize: true});
 
-                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n${pysakit}\n${koodit}`, {replyMarkup} );
-                    
-            }
-        })           
+
+
+
+                //Tähän for looppi joka tekee napin jokaisesta pysäkin nimestä telegramiin
+
+                //Keyboard (Button) test. Tätä voi käyttää hyväks siihen for looppiin...
+                let replyMarkup = bot.keyboard([
+                    ['/start'],
+                    ['/hide']
+                ], { resize: true });
+
+                return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n${pysakit}\n${koodit}`, { replyMarkup });
+
+            })
     }
-})
+}
+)
 
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
     return bot.sendMessage(
-        msg.from.id, 'Pysäkkivaihtoehdot piilotettu', {replyMarkup: 'hide'}
+        msg.from.id, 'Pysäkkivaihtoehdot piilotettu', { replyMarkup: 'hide' }
     );
 });
 
