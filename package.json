@@ -25,6 +25,7 @@
     "graphql-request": "^1.4.1",
     "gtfs-realtime-bindings": "0.0.4",
     "isomorphic-fetch": "^2.2.1",
+    "jsonpath": "^1.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-relay": "^1.4.1",

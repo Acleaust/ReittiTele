@@ -1,5 +1,5 @@
 const TeleBot = require('telebot');
-const bot = new TeleBot('hää hää häijjä'); //'BotToken'
+const bot = new TeleBot('421446760:AAHVNT3llWsGwbS9lCIFs1LLnJ1NZCyy3SE'); //'BotToken'
 const { request } = require('graphql-request')
 
 //Muuttujat
@@ -45,16 +45,16 @@ bot.on('text', msg => {
                     console.log("Vastaus: " + vastaus)
                     console.log("----")
               
-                    //nää pitäs vaa saada samlle riville xd
-                    for(stops in query) {
-                        // var vastaus = JSON.stringify(query[stops])
-                        console.log(stops+": "+vastaus[stops]);
-                    }
+                    
                 
                     /* Toinen random testi
                     for(name in data) {
                         console.log(JSON.stringify(data[name]))
                     }*/
+
+                    var jp = require('jsonpath');
+                    var pysakit = jp.query(data, '$..name');
+                    var koodit = jp.query(data, '$..code')
 
                     //Tähän for looppi joka tekee napin jokaisesta pysäkin nimestä telegramiin
 
@@ -64,7 +64,7 @@ bot.on('text', msg => {
                         ['/hide']
                     ], {resize: true});
 
-                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n${vastaus}`, {replyMarkup} );
+                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n${pysakit}\n${koodit}`, {replyMarkup} );
                     
             }
         })           
