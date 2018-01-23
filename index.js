@@ -60,11 +60,10 @@ bot.on('text', msg => {
                    
                         
                         for (i = 0; i < pysakit.length; i += 1) {
-                               // var k = koodit[i++];
-                     // var  koodijapys = e+" "+k;
-
-                       // console.log(koodijapys);
-                       console.log(pysakit[i]+" "+koodit[i]);
+                    var pk = pysakit[i]+" "+koodit[i]
+                  //     var str = pysakit.koodit.join(', ');
+                       // return bot.sendMessage(str);
+                       console.log(pk);
                 }
                 }
 
