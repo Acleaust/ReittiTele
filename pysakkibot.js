@@ -2,6 +2,7 @@
 const TeleBot = require('telebot');
 const { request } = require('graphql-request')
 var jp = require('jsonpath');
+var TimeFormat = require('hh-mm-ss')
 
 //BotToken
 const bot = new TeleBot('BotToken');
@@ -18,7 +19,12 @@ bot.on('/start', (msg) => {
     return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\nBotti on tällä hetkellä kesken, joten toiminnallisuutta ei vielä ole.\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
+var aika = TimeFormat.fromS(81000, 'hh:mm') 
+console.log(aika)
+
 //Koko "pääohjelma"
+
+//Käyttäjän sijainnista
 
 // Etsii jokaisesta viestistä pysäkin nimeä
 bot.on('text', msg => {
