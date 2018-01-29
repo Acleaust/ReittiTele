@@ -1,6 +1,10 @@
+//Pysäkkibot
 const TeleBot = require('telebot');
-const bot = new TeleBot('503339568:AAH8U7KRQCoGGdxoCCWcreJUWFAdOHG31dQ'); //'BotToken'
 const { request } = require('graphql-request')
+var jp = require('jsonpath');
+
+//BotToken
+const bot = new TeleBot('BotToken');
 
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
@@ -11,7 +15,7 @@ var pysakkivalinta;
 
 //Komennot
 bot.on('/start', (msg) => {
-    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia! Botti on tällä hetkellä kesken, joten toiminnallisuutta ei vielä ole.\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").`); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\nBotti on tällä hetkellä kesken, joten toiminnallisuutta ei vielä ole.\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 //Koko "pääohjelma"
@@ -28,6 +32,7 @@ bot.on('text', msg => {
         //Hakulause
         const query = `{
 	    stops(name: "${text}") {
+        gtfsId
         name
         code
         }
@@ -40,12 +45,11 @@ bot.on('text', msg => {
                 //Jos pysäkkiä ei löydy
                 if (vastaus == vaaravastaus) {
                     return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
-                } else {
+                }else{
                     //Hakee pyäkit ja koodit niille
-                    var jp = require('jsonpath');
                     var pysakit = jp.query(data, '$..name');
                     var koodit = jp.query(data, '$..code')
-                   //Erittelee pysäkit ja yhdistää koodit
+                    //Erittelee pysäkit ja yhdistää koodit
                     for (i = 0; i < pysakit.length; i += 1) {
                         var pk = pysakit[i]+" "+koodit[i]+"\n"
                         console.log(pk);
