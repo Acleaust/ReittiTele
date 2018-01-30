@@ -13,10 +13,13 @@ const vaaravastaus = '{"stops":[]}'
 const cstart = "/start"
 const chide = "/hide"
 var pysakkivalinta;
+const LOCvaaravastaus = '{"places":{"edges":[]}}'
+var lahdot;
+var kellonajat;
 
 //Komennot
 bot.on('/start', (msg) => {
-    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\nBotti on tällä hetkellä kesken, joten toiminnallisuutta ei vielä ole.\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").`); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").\n\nToinen tapa on lähettää sijainti ja saat lähistön seuraavat lähdöt!`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 var aika = TimeFormat.fromS(49663, 'hh:mm:ss') 
@@ -33,11 +36,12 @@ bot.on(['location', 'contact'], (msg, self) => {
     var latitude = jp.query(sijainti, '$..latitude')
     var longitude = jp.query(sijainti, '$..longitude')
 
+    //Query
     const querygetlocation = `{
         places: nearest(
         lat: ${latitude},
         lon: ${longitude},
-        maxDistance: 200,
+        maxDistance: 100,
         filterByPlaceTypes: DEPARTURE_ROW,
         ) {
           edges {
@@ -47,10 +51,15 @@ bot.on(['location', 'contact'], (msg, self) => {
                 id
                 __typename
                 ... on DepartureRow {
-                stoptimes (numberOfDepartures: 5) {
+                stoptimes (numberOfDepartures: 1) {
                 pickupType
                 realtimeDeparture
                 headsign
+                stop {
+                    name
+                    code
+                    platformCode
+                    }
                 
                 }
               }
@@ -63,9 +72,36 @@ bot.on(['location', 'contact'], (msg, self) => {
     //Hakulauseen suoritus
     return request(digiAPI, querygetlocation)
       .then(function (data) {
-          var locvastaus = JSON.stringify(data);
-    
-    return bot.sendMessage(msg.from.id, `Sijaintisi on ${ locvastaus }.`);
+          var vastaus = JSON.stringify(data);
+          if (vastaus == LOCvaaravastaus) {
+            return bot.sendMessage(id, `Läheltäsi ei valitettavastai löydy pysäkkejä.`);
+        }else{
+            //Hakee datasta dataa
+            var realtimedep = jp.query(data, '$..realtimeDeparture')
+            var headsign = jp.query(data, '$..headsign')
+            var pNimi = jp.query(data, '$..nimi')
+            var pCode = jp.query(data, '$..code')
+            var pPlatform = jp.query(data, '$..platformCode')
+
+            //Tekee kaikkee kivaa :)
+            for (i = 0; i < realtimedep.length; i += 1) {
+                var locVastaus1 = realtimedep[i];
+                //Muuttaa sekunnit tunneiksi ja minuuteiksi
+                var aika = TimeFormat.fromS(locVastaus1, 'hh:mm') ;
+                //Yhistää ajan ja määränpään
+                var locVastaus2 = aika+" "+headsign[i]+" "+pCode[i]+"\n"
+
+                //Yhdistää monta vastausta
+                if(lahdot == null){
+                    lahdot = locVastaus2;
+                }else{
+                    lahdot = lahdot += locVastaus2;
+                }
+            }
+            return bot.sendMessage(msg.from.id, `Lähdöt lähelläsi:\n${ lahdot }`);
+            var lahdot = undefined;
+
+}
 })});
 
 
@@ -128,6 +164,3 @@ bot.on('text', function (msg) {
 
 //Ohjelman pyöritys
 bot.start();
-
-//Queryt
-
