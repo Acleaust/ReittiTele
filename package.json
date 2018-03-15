@@ -22,7 +22,7 @@
     "delay": "^2.0.0",
     "es6-promise": "^4.2.2",
     "file-system": "^2.2.2",
-    "graphql-request": "^1.5.0",
+    "graphql-request": "^1.5.1",
     "gtfs-realtime-bindings": "0.0.4",
     "hh-mm-ss": "^1.2.0",
     "isomorphic-fetch": "^2.2.1",

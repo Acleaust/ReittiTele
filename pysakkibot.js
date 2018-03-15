@@ -6,7 +6,7 @@ var TimeFormat = require('hh-mm-ss')
 var limit = require('limit-string-length');
 
 //BotToken
-const bot = new TeleBot('503339568:AAHyyBN1dQz-T58-6QcT4hJA8cgyPFAZDZg');
+const bot = new TeleBot('503339568:AAHZmTPrp8GkTmADJopSaslyJfQvvSVgSCs');
 
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
@@ -15,9 +15,13 @@ const cstart = "/start"
 const chide = "/hide"
 var pysakkivalinta;
 const LOCvaaravastaus = '{"places":{"edges":[]}}'
-const LOCvaaravastaus2 = '[[]]'
+const LOCvaaravastaus2 = '[]'
 var lahdot;
 var kellonajat;
+
+var test;
+
+var fs = require('fs');
 
 //Komennot
 bot.on('/start', (msg) => {
@@ -27,7 +31,7 @@ bot.on('/start', (msg) => {
 //Koko "pääohjelma"
 
 //Käyttäjän sijainnista
-bot.on(['location', 'contact'], (msg, self) => {
+bot.on(['location'], (msg, self) => {
     let id = msg.from.id;
     let text = msg.text;
     let sijainti = msg.location;
@@ -90,48 +94,53 @@ bot.on(['location', 'contact'], (msg, self) => {
 
                 //Uus for looppi
                 for (i = 0; i < stoptimes.length; i += 1) {
-                    var stoptimes1 = stoptimes[i]
-                    if (stoptimes1 == LOCvaaravastaus2) {
-                        console.log("Hypätty yli")
-                        //Älä tee mitään for now
+                    var stoptimes1 = JSON.stringify(stoptimes[i])
+
+
+                    //Kirjoittaa tiedostoon stoptimesit
+                    if(test == null) {
+                        test = stoptimes1 + "\n";
+                        fs.writeFile("test.txt", stoptimes1 + "\n") 
+                    } else {
+                        test = test + stoptimes1 + "\n";
+                        fs.writeFile("test.txt", test + "\n")
+                    }
+                    
+                    if (stoptimes == "[]") {
+                        console.log("Hypätty yli");
+                        var turhapaska = bNumero[i];
+                    //Älä tee mitään for now
+                    //Loppu 
                     } else {
                         var locVastaus1 = realtimedep[i]
+                        
+                        console.log(locVastaus1)
+
+                        if(locVastaus1 == undefined) {
+                            //Do nothing
+                        } else {
                         //Muuttaa sekunnit tunneiksi ja minuuteiksi
                         var aika = TimeFormat.fromS(locVastaus1, 'hh:mm');
-                        var aika2 = limit(aika, 5)
-
+                        var aika2 = limit(aika, 5);
+                        console.log(aika2)
+                        }
                         //Yhistää ajan ja määränpään
                         var locVastaus2 = aika2+"  "+bNumero[i]+" "+headsign[i]+" - "+pCode[i]+"\n";
+                        console.log("Yhdistää ajan ja määränp:  " + locVastaus2)
+                        if(lahdot == null){
+                            lahdot = locVastaus2;
+                            console.log("Tyhjään lahtöön lisäys")
+                        }else{
+                            console.log("Lahtöön lisäys")
+                            lahdot = lahdot + locVastaus2;
+                            //console.log(lahdot)
+                        } 
                     }
                 }
-
-                //Tekee kaikkee kivaa :) 
-                /** 
-                for (i = 0; i < realtimedep.length; i += 1) {
-                    var locVastaus1 = realtimedep[i];
-                    var stoptimes1 = stoptimes[i]
-                    //Muuttaa sekunnit tunneiksi ja minuuteiksi
-                    var aika = TimeFormat.fromS(locVastaus1, 'hh:mm');
-                    var aika2 = limit(aika, 5)
-    
-                    if (stoptimes1 == LOCvaaravastaus2) {
-                        console.log("Hypätty yli")
-                        //Älä tee mitään for now
-                    }else{
-                        //Yhistää ajan ja määränpään
-                    var locVastaus2 = aika2+"  "+bNumero[i]+" "+headsign[i]+" - "+pCode[i]+"\n";
-    
-                    //Yhdistää monta vastausta
-                    if(lahdot == null){
-                        lahdot = locVastaus2;
-                    }else{
-                        lahdot = lahdot += locVastaus2;
-                    }
-                    }
-            
-                }
-                */
+                
+                console.log("Lähettää viestin!")
                 return bot.sendMessage(msg.from.id, `Lähdöt lähelläsi:\n\n${lahdot}`);
+                //Asettaa lahdot tyhjäksi
                 var lahdot = undefined;
             }
         })

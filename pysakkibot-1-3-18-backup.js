@@ -6,7 +6,7 @@ var TimeFormat = require('hh-mm-ss')
 var limit = require('limit-string-length');
 
 //BotToken
-const bot = new TeleBot('503339568:AAHyyBN1dQz-T58-6QcT4hJA8cgyPFAZDZg');
+const bot = new TeleBot('503339568:AAHZmTPrp8GkTmADJopSaslyJfQvvSVgSCs');
 
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
