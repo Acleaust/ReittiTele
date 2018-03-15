@@ -73,69 +73,50 @@ bot.on(['location', 'contact'], (msg, self) => {
 
     //Hakulauseen suoritus
     return request(digiAPI, querygetlocation)
-        .then(function (data) {
-            var vastaus = JSON.stringify(data);
-            if (vastaus == LOCvaaravastaus) {
-                return bot.sendMessage(id, `Läheltäsi ei valitettavastai löydy pysäkkejä.`);
-            } else {
-                //Hakee datasta dataa
-                var stoptimes = jp.query(data, '$..stoptimes')
+      .then(function (data) {
+          var vastaus = JSON.stringify(data);
+          if (vastaus == LOCvaaravastaus) {
+            return bot.sendMessage(id, `Läheltäsi ei valitettavastai löydy pysäkkejä.`);
+        }else{
+            //Hakee datasta dataa
+            var stoptimes = jp.query(data, '$..stoptimes')
 
-                var realtimedep = jp.query(data, '$..realtimeDeparture')
-                var headsign = jp.query(stoptimes, '$..headsign')
-                var pNimi = jp.query(data, '$..nimi')
-                var pCode = jp.query(stoptimes, '$..code')
-                var pPlatform = jp.query(stoptimes, '$..platformCode')
-                var bNumero = jp.query(data, '$..shortName')
+            var realtimedep = jp.query(data, '$..realtimeDeparture')
+            var headsign = jp.query(stoptimes, '$..headsign')
+            var pNimi = jp.query(data, '$..nimi')
+            var pCode = jp.query(stoptimes, '$..code')
+            var pPlatform = jp.query(stoptimes, '$..platformCode')
+            var bNumero = jp.query(data, '$..shortName')
+           
+            //Tekee kaikkee kivaa :)
+            for (i = 0; i < realtimedep.length; i += 1) {
+                var locVastaus1 = realtimedep[i];
+                var stoptimes1 = stoptimes[i]
+                //Muuttaa sekunnit tunneiksi ja minuuteiksi
+                var aika = TimeFormat.fromS(locVastaus1, 'hh:mm');
+                var aika2 = limit(aika, 5)
 
-                //Uus for looppi
-                for (i = 0; i < stoptimes.length; i += 1) {
-                    var stoptimes1 = stoptimes[i]
-                    if (stoptimes1 == LOCvaaravastaus2) {
-                        console.log("Hypätty yli")
-                        //Älä tee mitään for now
-                    } else {
-                        var locVastaus1 = realtimedep[i]
-                        //Muuttaa sekunnit tunneiksi ja minuuteiksi
-                        var aika = TimeFormat.fromS(locVastaus1, 'hh:mm');
-                        var aika2 = limit(aika, 5)
+                if (stoptimes1 == LOCvaaravastaus2) {
+                    console.log("Hypätty yli")
+                    //Älä tee mitään for now
+                }else{
+                    //Yhistää ajan ja määränpään
+                var locVastaus2 = aika2+"  "+bNumero[i]+" "+headsign[i]+" - "+pCode[i]+"\n";
 
-                        //Yhistää ajan ja määränpään
-                        var locVastaus2 = aika2+"  "+bNumero[i]+" "+headsign[i]+" - "+pCode[i]+"\n";
-                    }
+                //Yhdistää monta vastausta
+                if(lahdot == null){
+                    lahdot = locVastaus2;
+                }else{
+                    lahdot = lahdot += locVastaus2;
                 }
-
-                //Tekee kaikkee kivaa :) 
-                /** 
-                for (i = 0; i < realtimedep.length; i += 1) {
-                    var locVastaus1 = realtimedep[i];
-                    var stoptimes1 = stoptimes[i]
-                    //Muuttaa sekunnit tunneiksi ja minuuteiksi
-                    var aika = TimeFormat.fromS(locVastaus1, 'hh:mm');
-                    var aika2 = limit(aika, 5)
-    
-                    if (stoptimes1 == LOCvaaravastaus2) {
-                        console.log("Hypätty yli")
-                        //Älä tee mitään for now
-                    }else{
-                        //Yhistää ajan ja määränpään
-                    var locVastaus2 = aika2+"  "+bNumero[i]+" "+headsign[i]+" - "+pCode[i]+"\n";
-    
-                    //Yhdistää monta vastausta
-                    if(lahdot == null){
-                        lahdot = locVastaus2;
-                    }else{
-                        lahdot = lahdot += locVastaus2;
-                    }
-                    }
-            
                 }
-                */
-                return bot.sendMessage(msg.from.id, `Lähdöt lähelläsi:\n\n${lahdot}`);
-                var lahdot = undefined;
+        
             }
-        })
-});
+
+            return bot.sendMessage(msg.from.id, `Lähdöt lähelläsi:\n\n${ lahdot }`);
+            var lahdot = undefined;
+}
+})});
 
 // Etsii jokaisesta viestistä pysäkin nimeä
 bot.on('text', msg => {
@@ -162,27 +143,24 @@ bot.on('text', msg => {
                 //Jos pysäkkiä ei löydy
                 if (vastaus == vaaravastaus) {
                     return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
-                } else {
+                }else{
                     //Hakee pyäkit ja koodit niille
                     var pysakit = jp.query(data, '$..name')
                     var koodit = jp.query(data, '$..code')
                     //Erittelee pysäkit ja yhdistää koodit
                     for (i = 0; i < pysakit.length; i += 1) {
-                        var pk = pysakit[i] + " " + koodit[i] + ""
+                        var pk = pysakit[i]+" "+koodit[i]+""
                         console.log(pk);
                         //Tallentaa muuttujaan pysäkit + koodit viestiä varten
-                        if (pysakkivalinta == null) {
+                        if(pysakkivalinta == null){
                             pysakkivalinta = pk;
-                        } else {
+                        }else{
                             pysakkivalinta = pysakkivalinta += pk;
                         }
                     }   //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
-                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n\n${pysakkivalinta}`, );
-                    var pysakkivalinta = undefined;
-                }
-            })
-    }
-})
+                        return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n\n${pysakkivalinta}`,);
+                        var pysakkivalinta = undefined;
+                    }})}})
 
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
