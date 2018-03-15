@@ -5,7 +5,7 @@ var jp = require('jsonpath');
 var TimeFormat = require('hh-mm-ss')
 
 //BotToken
-const bot = new TeleBot('BotToken');
+const bot = new TeleBot('421446760:AAHVNT3llWsGwbS9lCIFs1LLnJ1NZCyy3SE');
 
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
@@ -142,13 +142,31 @@ bot.on('text', msg => {
                         //Tallentaa muuttujaan pysäkit + koodit viestiä varten
                         if(pysakkivalinta == null){
                             pysakkivalinta = pk;
-                        }else{
+                        } else {
                             pysakkivalinta = pysakkivalinta += pk;
+
                         }
                     }   //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
                         return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n\n${pysakkivalinta}`,);
                         var pysakkivalinta = undefined;
                     }})}})
+
+                    bot.on('/1', msg => {
+                        return bot.sendMessage(
+                            msg.from.id, 'Mäkkylä',
+                        );
+                    });
+                    bot.on('/2', msg => {
+                        return bot.sendMessage(
+                            msg.from.id,'Bäkkylä' , 
+                        );
+                    });
+                    bot.on('/3', msg => {
+                        return bot.sendMessage(
+                            msg.from.id, 'Pysäkkivaihtoehdot piilotettu', 
+                    });
+
+
 
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
