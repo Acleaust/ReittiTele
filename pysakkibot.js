@@ -106,11 +106,13 @@ bot.on(['location'], (msg, self) => {
                         fs.writeFile("test.txt", test + "\n")
                     }
                     
-                    if (stoptimes == "[]") {
+                    if (stoptimes1 == "[]") {
+
                         console.log("Hypätty yli");
-                        var turhapaska = bNumero[i];
+                        //var turhapaska = bNumero[i] + realtimedep[i];
                     //Älä tee mitään for now
                     //Loppu 
+
                     } else {
                         var locVastaus1 = realtimedep[i]
                         

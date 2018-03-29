@@ -15,6 +15,7 @@ var req = {
   url: 'http://api.digitransit.fi/realtime/service-alerts/v1/',
   encoding: null
 };
+
 bot.on('/info', (msg) => {
 request(req, function (error, response, body) {
   if (!error && response.statusCode == 200) {
