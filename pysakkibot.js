@@ -6,7 +6,7 @@ var TimeFormat = require('hh-mm-ss')
 var limit = require('limit-string-length');
 
 //BotToken
-const bot = new TeleBot('503339568:AAFczcOjoKBXdei1dSAc7o-MVuX2C7z5XRQ');
+const bot = new TeleBot('503339568:AAHv3iGM75fpHHo0m8DV332JX_5PIYoU19A');
 
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
@@ -18,9 +18,7 @@ const LOCvaaravastaus = '{"places":{"edges":[]}}'
 const LOCvaaravastaus2 = '[]'
 var lahdot;
 var kellonajat;
-
 var test;
-
 var fs = require('fs');
 
 //Komennot
@@ -39,7 +37,7 @@ bot.on(['location'], (msg, self) => {
     var latitude = jp.query(sijainti, '$..latitude')
     var longitude = jp.query(sijainti, '$..longitude')
 
-    console.log("Location vastaanotettu")
+    console.log(`[location] ${msg.chat.id}`)
 
     //Query
     const querygetlocation = `{
@@ -95,7 +93,7 @@ bot.on(['location'], (msg, self) => {
                 var node2 = nodehaku[i]
 
                 if (stoptimesif == "[]") {
-                    console.log("Hypätty yli!")
+                    //console.log("Hypätty yli!")
                 }else{
                     //Ajan haku ja muunto tunneiksi ja minuuteiksi
                     var realtime = jp.query(stoptimes2, '$..realtimeDeparture')
@@ -111,7 +109,7 @@ bot.on(['location'], (msg, self) => {
                     var pysakkikoodi = jp.query(stoptimes2, '$..code')
 
                     //Konsoliin kaikki
-                    console.log(JSON.stringify(departuretime+"  "+numlet +" "+ headsign+" - "+pysakkikoodi))
+                    //console.log(JSON.stringify(departuretime+"  "+numlet +" "+ headsign+" - "+pysakkikoodi))
                     var yksittainenlahto = departuretime+" "+numlet +" "+ headsign+" - "+pysakkikoodi+ "\n";
                     if (lahdot == null) {
                         lahdot = yksittainenlahto;
@@ -126,21 +124,17 @@ bot.on(['location'], (msg, self) => {
                 //Viestin lähetys
                 //Jos ei lähtöjä lähellä
                 if (lahdot == undefined) {
-                    console.log("Ei lähtöjä.")
+                    console.log("[info] Ei lähtöjä.")
                     return bot.sendMessage(msg.from.id, `Ei lähtöjä lähistöllä`);
                     var lahdot = undefined;
                 }else{
-                console.log("Viesti lähetetty!")
+                console.log("[info] Viesti lähetetty!")
                 return bot.sendMessage(msg.from.id, `Lähdöt lähelläsi:\n\n${lahdot}`);
                 var lahdot = undefined;
                 }
         }
         })});
 
-
-
-
-    
 //-----------------------------------------------
 // Etsii jokaisesta viestistä pysäkin nimeä
 bot.on('text', msg => {
@@ -201,5 +195,5 @@ bot.on('text', function (msg) {
     console.log(`[text] ${msg.chat.id} ${msg.text}`);
 });
 
-//Ohjelman pyöritys
+//Ohjelman pyöritys. Älä poista!
 bot.start();
