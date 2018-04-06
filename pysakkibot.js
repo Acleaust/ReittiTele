@@ -17,6 +17,7 @@ const vaaravastaus = '{"stops":[]}'
 var pysakkivalinta;
 const LOCvaaravastaus = '{"places":{"edges":[]}}'
 const LOCvaaravastaus2 = '[]'
+//const stopvaaravastaus = '{"stoptimesWithoutPatterns": []}'
 var lahdot;
 var kellonajat;
 var test;
@@ -184,12 +185,8 @@ bot.on('/hae', msg => {
                     var valintanumero = 0;
                     //Erittelee pysäkit ja yhdistää koodit
                     for (i = 0; i < pysakit.length; i += 1) {
-                        const vastaukset = bot.answerList
 
-
-
-                        var valintanumero = valintanumero + 1;
-                        var pk = "/"+valintanumero +" "+ pysakit[i] + " - " + koodit[i] + "\n"
+                        var pk = "/"+koodit[i]+" "+ pysakit[i] + " - " + koodit[i] + "\n"
                         //console.log(pk);
                         //Tallentaa muuttujaan pysäkit + koodit viestiä varten
                         if (pysakkivalinta == null) {
@@ -206,18 +203,40 @@ bot.on('/hae', msg => {
     }
 })
 
+//Vastaus
 bot.on('ask.valinta', msg => {
-
-    // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (text == "/start" || text == "/hide" || text == "/hae") {
-        //console.log("[info] /start tai /hide")
-        //Älä tee mitään
-    }else{
     const id = msg.from.id;
     const valinta = msg.text;
 
-    return bot.sendMessage(id, `Valinta: ${ valinta }`);
-}});
+    // Tähän komennot joita jotka ei tee pysäkkihakua
+    if (valinta == "/start" || valinta == "/hide" || valinta == "/hae") {
+        //console.log("[info] /start tai /hide")
+        //Älä tee mitään
+    }else{
+    valintavastaus = valinta.replace('/', '');
+
+    const querygetstoptimesforstops = `{
+        stops(name: "${valintavastaus}") {
+          name
+          code
+            stoptimesWithoutPatterns {
+            realtimeDeparture
+            headsign
+            }patterns{route {
+              shortName
+            }}
+        }  
+      }`
+
+    //Hakulauseen suoritus
+    return request(digiAPI, querygetlocation)
+    .then(function (data) {
+        var vastaus = JSON.stringify(data);
+
+    
+    
+    return bot.sendMessage(id, `Valitsit pysäkin: ${ valintavastaus }`);
+})}});
 
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
