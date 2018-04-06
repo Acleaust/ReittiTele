@@ -34,7 +34,7 @@ bot.on('text', function (msg) {
 
 //Komennot
 bot.on('/start', (msg) => {
-    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").\n\nToinen tapa on lähettää sijainti ja saat lähistön seuraavat lähdöt!`); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\n\nVoit aloittaa käytön kirjoittamalla /hae ja pysäkin nimen tai sen koodin (esim: "/hae Keilaniemi" tai "/hae E4017").\n\nVoit myös lähettää sijainnin ja saat lähistöltä seuraavat lähdöt!`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 //-----------------------------------------------
@@ -89,49 +89,49 @@ bot.on(['location'], (msg, self) => {
 
     //Hakulauseen suoritus
     return request(digiAPI, querygetlocation)
-    .then(function (data) {
-        var vastaus = JSON.stringify(data);
-        if (vastaus == LOCvaaravastaus) {
-            return bot.sendMessage(id, `Läheltäsi ei valitettavastai löydy pysäkkejä.`);
-        } else {
-            //Datan haku queryn vastauksesta
-            var nodehaku = jp.query(data, '$..node')
-            var stoptimes = jp.query(nodehaku, '$..stoptimes')
+        .then(function (data) {
+            var vastaus = JSON.stringify(data);
+            if (vastaus == LOCvaaravastaus) {
+                return bot.sendMessage(id, `Läheltäsi ei valitettavastai löydy pysäkkejä.`);
+            } else {
+                //Datan haku queryn vastauksesta
+                var nodehaku = jp.query(data, '$..node')
+                var stoptimes = jp.query(nodehaku, '$..stoptimes')
 
-            //Erotellaan lähdöt toisitaan
-            for (i = 0; i < nodehaku.length; i += 1) {
-                var stoptimesif = JSON.stringify(stoptimes[i])
-                var stoptimes2 = stoptimes[i]
-                var node2 = nodehaku[i]
+                //Erotellaan lähdöt toisitaan
+                for (i = 0; i < nodehaku.length; i += 1) {
+                    var stoptimesif = JSON.stringify(stoptimes[i])
+                    var stoptimes2 = stoptimes[i]
+                    var node2 = nodehaku[i]
 
-                if (stoptimesif == "[]") {
-                    //console.log("Hypätty yli!")
-                }else{
-                    //Ajan haku ja muunto tunneiksi ja minuuteiksi
-                    var realtime = jp.query(stoptimes2, '$..realtimeDeparture')
-                    var realtime2 = Number(realtime)
-                    //Muuttaa sekunnit tunneiksi ja minuuteiksi
-                    var departuretime = TimeFormat.fromS(realtime2, 'hh:mm');
-
-                    //Hakee linjan numeron tai kirjaimen
-                    var numlet = jp.query(node2, '$..shortName')
-                    //Hakee Määränpään
-                    var headsign = jp.query(stoptimes2, '$..headsign')
-                    //Hakee pysäkin
-                    var pysakkikoodi = jp.query(stoptimes2, '$..code')
-
-                    //Konsoliin kaikki
-                    //console.log(JSON.stringify(departuretime+"  "+numlet +" "+ headsign+" - "+pysakkikoodi))
-                    var yksittainenlahto = departuretime+" "+numlet +" "+ headsign+" - "+pysakkikoodi+ "\n";
-                    if (lahdot == null) {
-                        lahdot = yksittainenlahto;
-                        //console.log("Tyhjään lahtöön lisäys")
+                    if (stoptimesif == "[]") {
+                        //console.log("Hypätty yli!")
                     } else {
-                        //console.log("Lahtöön lisäys")
-                        lahdot = lahdot + yksittainenlahto;
-                        //console.log(lahdot)
-                    } 
-                }
+                        //Ajan haku ja muunto tunneiksi ja minuuteiksi
+                        var realtime = jp.query(stoptimes2, '$..realtimeDeparture')
+                        var realtime2 = Number(realtime)
+                        //Muuttaa sekunnit tunneiksi ja minuuteiksi
+                        var departuretime = TimeFormat.fromS(realtime2, 'hh:mm');
+
+                        //Hakee linjan numeron tai kirjaimen
+                        var numlet = jp.query(node2, '$..shortName')
+                        //Hakee Määränpään
+                        var headsign = jp.query(stoptimes2, '$..headsign')
+                        //Hakee pysäkin
+                        var pysakkikoodi = jp.query(stoptimes2, '$..code')
+
+                        //Konsoliin kaikki
+                        //console.log(JSON.stringify(departuretime+"  "+numlet +" "+ headsign+" - "+pysakkikoodi))
+                        var yksittainenlahto = departuretime + " " + numlet + " " + headsign + " - " + pysakkikoodi + "\n";
+                        if (lahdot == null) {
+                            lahdot = yksittainenlahto;
+                            //console.log("Tyhjään lahtöön lisäys")
+                        } else {
+                            //console.log("Lahtöön lisäys")
+                            lahdot = lahdot + yksittainenlahto;
+                            //console.log(lahdot)
+                        }
+                    }
                 }
                 //Viestin lähetys
                 //Jos ei lähtöjä lähellä
@@ -139,13 +139,14 @@ bot.on(['location'], (msg, self) => {
                     console.log("[info] Ei lähtöjä.")
                     return bot.sendMessage(msg.from.id, `Ei lähtöjä lähistöllä`);
                     var lahdot = undefined;
-                }else{
-                console.log("[info] Viesti lähetetty!")
-                return bot.sendMessage(msg.from.id, `Lähdöt lähelläsi:\n\n${lahdot}`);
-                var lahdot = undefined;
+                } else {
+                    console.log("[info] Viesti lähetetty!")
+                    return bot.sendMessage(msg.from.id, `Lähdöt lähelläsi:\n\n${lahdot}`);
+                    var lahdot = undefined;
                 }
-        }
-        })});
+            }
+        })
+});
 
 //-----------------------------------------------
 
@@ -161,6 +162,7 @@ bot.on('/hae', msg => {
         //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {
+
         //Hakulause
         const query = `{
 	    stops(name: "${text}") {
@@ -181,13 +183,9 @@ bot.on('/hae', msg => {
                     //Hakee pyäkit ja koodit niille
                     var pysakit = jp.query(data, '$..name')
                     var koodit = jp.query(data, '$..code')
-
-                    var valintanumero = 0;
                     //Erittelee pysäkit ja yhdistää koodit
                     for (i = 0; i < pysakit.length; i += 1) {
-
-                        var pk = "/"+koodit[i]+" "+ pysakit[i] + " - " + koodit[i] + "\n"
-                        //console.log(pk);
+                        var pk = "/" + koodit[i] + " " + pysakit[i] + " - " + koodit[i] + "\n"
                         //Tallentaa muuttujaan pysäkit + koodit viestiä varten
                         if (pysakkivalinta == null) {
                             pysakkivalinta = pk;
@@ -196,13 +194,13 @@ bot.on('/hae', msg => {
                         }
                     }   //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
                     const id = msg.from.id;
-                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, {ask: 'valinta'});
+                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'valinta' });
                     var pysakkivalinta = undefined;
                 }
             })
     }
 })
-
+//-----------Vastaus edelliseen------------------
 //Vastaus
 bot.on('ask.valinta', msg => {
     const id = msg.from.id;
@@ -212,31 +210,83 @@ bot.on('ask.valinta', msg => {
     if (valinta == "/start" || valinta == "/hide" || valinta == "/hae") {
         //console.log("[info] /start tai /hide")
         //Älä tee mitään
-    }else{
-    valintavastaus = valinta.replace('/', '');
+    } else {
+        valintavastaus = valinta.replace('/', '');
 
-    const querygetstoptimesforstops = `{
-        stops(name: "${valintavastaus}") {
-          name
-          code
-            stoptimesWithoutPatterns {
-            realtimeDeparture
-            headsign
-            }patterns{route {
-              shortName
-            }}
-        }  
-      }`
+        const querygetstoptimesforstops = `{
+            stops(name: "${valintavastaus}") {
+              name
+              code
+              stoptimesWithoutPatterns {
+                realtimeDeparture
+                headsign
+                trip {
+                  pattern {
+                    route {
+                      shortName
+                    }
+                  }
+                }
+              }
+            }
+          }`
 
-    //Hakulauseen suoritus
-    return request(digiAPI, querygetlocation)
-    .then(function (data) {
-        var vastaus = JSON.stringify(data);
+        //Hakulauseen suoritus
+        return request(digiAPI, querygetstoptimesforstops)
+            .then(function (data) {
+                var vastaus = JSON.stringify(data);
+                //Datan haku queryn vastauksesta
+                var stopshaku = jp.query(data, '$..stops')
+                var stoptimeshaku = jp.query(stopshaku, '$..stoptimesWithoutPatterns')
+                var realtimehaku = jp.query(data, '$..realtimeDeparture')
+                console.log(realtime)
 
-    
-    
-    return bot.sendMessage(id, `Valitsit pysäkin: ${ valintavastaus }`);
-})}});
+                for (i = 0; i < realtimehaku.length; i += 1) {
+                    var stoptimesif = JSON.stringify(stoptimeshaku[i])
+                    var realtime = realtimehaku[i]
+                    if (stoptimesif == "[]") {
+                        console.log("Hypätty yli")
+                        //Do nothing
+                    } else {
+                        //Pysäkin nimi
+                        var pysakki = jp.query(stopshaku, '$..name')
+
+                        //ajan haku ja muunto tunneiksi ja sekunneiksi
+                        var realtime3 = Number(realtime)
+                        //Muunto
+                        var departuretime = TimeFormat.fromS(realtime3, 'hh:mm');
+                        var departuretimeshort = limit(departuretime, 5)
+                        //Hakee linjan numeron tai kirjaimen
+                        var numlet = jp.query(data, '$..shortName')
+                        //Hakee määränpään
+                        var headsign = jp.query(stopshaku, '$..headsign')
+
+                        //Yhdistys
+                        var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsign[i] + "\n";
+
+                        if (lahdot == null) {
+                            lahdot = yksittainenlahto;
+                            //console.log("Tyhjään lahtöön lisäys")
+                        } else {
+                            //console.log("Lahtöön lisäys")
+                            lahdot = lahdot + yksittainenlahto;
+                            //console.log(lahdot)
+                        }
+                    }
+                }
+                if (lahdot == undefined) {
+                    console.log("[info] Ei lähtöjä.")
+                    return bot.sendMessage(msg.from.id, `Ei lähtöjä pysäkiltä.`);
+                    var lahdot = undefined;
+                } else {
+                    console.log("[info] Viesti lähetetty!")
+                    return bot.sendMessage(msg.from.id, `Lähdöt pysäkiltä ${pysakki}:\n\n${lahdot}`);
+                    var lahdot = undefined;
+                }
+                //return bot.sendMessage(id, `Valitsit pysäkin: ${ valintavastaus }`);
+            })
+    }
+});
 
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
