@@ -1,3 +1,3 @@
 # ReittiTele
 
-Projekti on testaus Telegramin bot platformiin ja Digitransitin API:n käyttöön. Sisältää paljon sähläystä.
+Projekti Telegramin bot platformiin ja Digitransitin API:n käyttöön. Projektissa rakennetaan Telegram botti, joka tulostelee HSL aikatauluja. 

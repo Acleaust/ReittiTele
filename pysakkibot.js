@@ -8,7 +8,7 @@ var fs = require('fs');
 
 //BotToken
 const bot = new TeleBot({
-    token: '503339568:AAHv3iGM75fpHHo0m8DV332JX_5PIYoU19A',
+    token: 'token',
     usePlugins: ['askUser']
 });
 //Muuttujat
@@ -29,7 +29,6 @@ var test;
 bot.on('text', function (msg) {
     console.log(`[text] ${msg.chat.id} ${msg.text}`);
 });
-
 //-----------------------------------------------
 
 //Komennot
@@ -56,7 +55,7 @@ bot.on(['location'], (msg, self) => {
         places: nearest(
         lat: ${latitude},
         lon: ${longitude},
-        maxDistance: 300,
+        maxDistance: 350,
         filterByPlaceTypes: DEPARTURE_ROW,
         ) {
             edges {
@@ -158,11 +157,13 @@ bot.on('/hae', msg => {
     text = text.replace('/hae ', '');
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (text == "/start" || text == "/hide" || text == "/hae") {
+    if (text == "/start" || text == "/hide") {
         //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {
-
+        if (text == "/hae") {
+            return bot.sendMessage(id, `Voit etsiä pysäkkejä kirjoittamalla /hae ja pysäkin nimi tai koodi samaan viestiin`)
+        }else{
         //Hakulause
         const query = `{
 	    stops(name: "${text}") {
@@ -198,7 +199,7 @@ bot.on('/hae', msg => {
                     var pysakkivalinta = undefined;
                 }
             })
-    }
+    }}
 })
 //-----------Vastaus edelliseen------------------
 //Vastaus
@@ -217,7 +218,7 @@ bot.on('ask.valinta', msg => {
             stops(name: "${valintavastaus}") {
               name
               code
-              stoptimesWithoutPatterns {
+              stoptimesWithoutPatterns (numberOfDepartures: 8) {
                 realtimeDeparture
                 headsign
                 trip {
@@ -239,7 +240,6 @@ bot.on('ask.valinta', msg => {
                 var stopshaku = jp.query(data, '$..stops')
                 var stoptimeshaku = jp.query(stopshaku, '$..stoptimesWithoutPatterns')
                 var realtimehaku = jp.query(data, '$..realtimeDeparture')
-                console.log(realtime)
 
                 for (i = 0; i < realtimehaku.length; i += 1) {
                     var stoptimesif = JSON.stringify(stoptimeshaku[i])
@@ -250,6 +250,7 @@ bot.on('ask.valinta', msg => {
                     } else {
                         //Pysäkin nimi
                         var pysakki = jp.query(stopshaku, '$..name')
+                        var koodi = jp.query(stopshaku, '$..code')
 
                         //ajan haku ja muunto tunneiksi ja sekunneiksi
                         var realtime3 = Number(realtime)
@@ -260,10 +261,13 @@ bot.on('ask.valinta', msg => {
                         var numlet = jp.query(data, '$..shortName')
                         //Hakee määränpään
                         var headsign = jp.query(stopshaku, '$..headsign')
-
+                        var headsingif = headsign[i]
+                        if (headsingif == null) {
+                            console.log("[debug] Null skip")
+                        }else{
                         //Yhdistys
-                        var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsign[i] + "\n";
-
+                        var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsingif + "\n";
+                        
                         if (lahdot == null) {
                             lahdot = yksittainenlahto;
                             //console.log("Tyhjään lahtöön lisäys")
@@ -271,7 +275,7 @@ bot.on('ask.valinta', msg => {
                             //console.log("Lahtöön lisäys")
                             lahdot = lahdot + yksittainenlahto;
                             //console.log(lahdot)
-                        }
+                        }}
                     }
                 }
                 if (lahdot == undefined) {
@@ -280,7 +284,7 @@ bot.on('ask.valinta', msg => {
                     var lahdot = undefined;
                 } else {
                     console.log("[info] Viesti lähetetty!")
-                    return bot.sendMessage(msg.from.id, `Lähdöt pysäkiltä ${pysakki}:\n\n${lahdot}`);
+                    return bot.sendMessage(msg.from.id, `Lähdöt pysäkiltä ${pysakki} - ${koodi}:\n\n${lahdot}`);
                     var lahdot = undefined;
                 }
                 //return bot.sendMessage(id, `Valitsit pysäkin: ${ valintavastaus }`);
@@ -293,6 +297,11 @@ bot.on('/hide', msg => {
     return bot.sendMessage(
         msg.from.id, 'Pysäkkivaihtoehdot piilotettu', { replyMarkup: 'hide' }
     );
+});
+//Vastaa stikkeriin stikkerillä
+bot.on('sticker', (msg) => {
+    console.log(`[sticker] ${msg.chat.id}`)
+    return msg.reply.sticker('img/1.webp', { asReply: true });
 });
 
 //Ohjelman pyöritys. Älä poista!
