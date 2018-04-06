@@ -4,27 +4,39 @@ const { request } = require('graphql-request')
 var jp = require('jsonpath');
 var TimeFormat = require('hh-mm-ss')
 var limit = require('limit-string-length');
+var fs = require('fs');
 
 //BotToken
-const bot = new TeleBot('503339568:AAHv3iGM75fpHHo0m8DV332JX_5PIYoU19A');
-
+const bot = new TeleBot({
+    token: '503339568:AAHv3iGM75fpHHo0m8DV332JX_5PIYoU19A',
+    usePlugins: ['askUser']
+});
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 const vaaravastaus = '{"stops":[]}'
-const cstart = "/start"
-const chide = "/hide"
 var pysakkivalinta;
 const LOCvaaravastaus = '{"places":{"edges":[]}}'
 const LOCvaaravastaus2 = '[]'
 var lahdot;
 var kellonajat;
 var test;
-var fs = require('fs');
+
+
+//-----------------------------------------------
+
+// Logaa jokaisen sisääntulevan viestin consoliin
+bot.on('text', function (msg) {
+    console.log(`[text] ${msg.chat.id} ${msg.text}`);
+});
+
+//-----------------------------------------------
 
 //Komennot
 bot.on('/start', (msg) => {
     return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\n\nVoit aloittaa käytön kirjoittamalla pysäkin nimen tai sen koodin (esim: "Keilaniemi" tai "E4017").\n\nToinen tapa on lähettää sijainti ja saat lähistön seuraavat lähdöt!`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
+
+//-----------------------------------------------
 
 //Koko "pääohjelma"
 
@@ -38,7 +50,6 @@ bot.on(['location'], (msg, self) => {
     var longitude = jp.query(sijainti, '$..longitude')
 
     console.log(`[location] ${msg.chat.id}`)
-
     //Query
     const querygetlocation = `{
         places: nearest(
@@ -136,13 +147,17 @@ bot.on(['location'], (msg, self) => {
         })});
 
 //-----------------------------------------------
+
 // Etsii jokaisesta viestistä pysäkin nimeä
-bot.on('text', msg => {
+bot.on('/hae', msg => {
     let id = msg.from.id;
     let text = msg.text;
 
+    text = text.replace('/hae ', '');
+
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (text == cstart) {
+    if (text == "/start" || text == "/hide" || text == "/hae") {
+        //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {
         //Hakulause
@@ -165,10 +180,17 @@ bot.on('text', msg => {
                     //Hakee pyäkit ja koodit niille
                     var pysakit = jp.query(data, '$..name')
                     var koodit = jp.query(data, '$..code')
+
+                    var valintanumero = 0;
                     //Erittelee pysäkit ja yhdistää koodit
                     for (i = 0; i < pysakit.length; i += 1) {
-                        var pk = pysakit[i] + " " + koodit[i] + ""
-                        console.log(pk);
+                        const vastaukset = bot.answerList
+
+
+
+                        var valintanumero = valintanumero + 1;
+                        var pk = "/"+valintanumero +" "+ pysakit[i] + " - " + koodit[i] + "\n"
+                        //console.log(pk);
                         //Tallentaa muuttujaan pysäkit + koodit viestiä varten
                         if (pysakkivalinta == null) {
                             pysakkivalinta = pk;
@@ -176,23 +198,32 @@ bot.on('text', msg => {
                             pysakkivalinta = pysakkivalinta += pk;
                         }
                     }   //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
-                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\n\n${pysakkivalinta}`, );
+                    const id = msg.from.id;
+                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, {ask: 'valinta'});
                     var pysakkivalinta = undefined;
                 }
             })
     }
 })
 
+bot.on('ask.valinta', msg => {
+
+    // Tähän komennot joita jotka ei tee pysäkkihakua
+    if (text == "/start" || text == "/hide" || text == "/hae") {
+        //console.log("[info] /start tai /hide")
+        //Älä tee mitään
+    }else{
+    const id = msg.from.id;
+    const valinta = msg.text;
+
+    return bot.sendMessage(id, `Valinta: ${ valinta }`);
+}});
+
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
     return bot.sendMessage(
         msg.from.id, 'Pysäkkivaihtoehdot piilotettu', { replyMarkup: 'hide' }
     );
-});
-
-// Logaa jokaisen sisääntulevan viestin consoliin
-bot.on('text', function (msg) {
-    console.log(`[text] ${msg.chat.id} ${msg.text}`);
 });
 
 //Ohjelman pyöritys. Älä poista!
