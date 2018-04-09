@@ -8,7 +8,7 @@ var fs = require('fs');
 
 //BotToken
 const bot = new TeleBot({
-    token: '503339568:AAEcvmRbUL7YWaOIIATmyPhJ2SPAUEH43Wk',
+    token: 'TOKEN',
     usePlugins: ['askUser']
 });
 //Muuttujat
@@ -179,6 +179,7 @@ bot.on('/hae', msg => {
                     var vastaus = JSON.stringify(data);
                     //Jos pysäkkiä ei löydy
                     if (vastaus == vaaravastaus) {
+                        console.log("[info] Viesti lähetetty! (Pysäkkiä ei löydy)")
                         return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
                     } else {
                         //Hakee pyäkit ja koodit niille
@@ -196,6 +197,7 @@ bot.on('/hae', msg => {
                         }
                         //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
                         const id = msg.from.id;
+                        console.log("[info] Viesti lähetetty!")
                         return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'valinta' });
                         var pysakkivalinta = undefined;
                     }
@@ -210,7 +212,7 @@ bot.on('ask.valinta', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae")) {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/linja" ){
         //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {
@@ -265,7 +267,8 @@ bot.on('ask.valinta', msg => {
                         var headsign = jp.query(stopshaku, '$..headsign')
                         var headsingif = headsign[i]
                         if (headsingif == null) {
-                            console.log("[debug] Null skip")
+                            //console.log("[debug] Null skip")
+                            //Älä tee mitään
                         } else {
                             //Yhdistys
                             var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsingif + "\n";
@@ -286,7 +289,7 @@ bot.on('ask.valinta', msg => {
                     return bot.sendMessage(msg.from.id, `Ei lähtöjä pysäkiltä.`);
                     var lahdot = undefined;
                 } else {
-                    console.log("[info] Viesti lähetetty!")
+                    console.log("[info] Vastaus lähetetty!")
                     return bot.sendMessage(msg.from.id, `Lähdöt pysäkiltä ${pysakki} - ${koodi}:\n\n${lahdot}`, { ask: 'valinta' });
                     var lahdot = undefined;
                 }

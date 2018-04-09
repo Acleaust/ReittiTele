@@ -1,1 +1,0 @@
-node pysakkibot.js
