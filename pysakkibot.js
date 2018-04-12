@@ -8,7 +8,7 @@ var fs = require('fs');
 
 //BotToken
 const bot = new TeleBot({
-    token: 'token',
+    token: 'TOKEN',
     usePlugins: ['askUser']
 });
 //Muuttujat
@@ -220,7 +220,7 @@ bot.on('ask.valinta', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help") {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" ) {
         //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {
@@ -275,7 +275,8 @@ bot.on('ask.valinta', msg => {
                         var headsign = jp.query(stopshaku, '$..headsign')
                         var headsingif = headsign[i]
                         if (headsingif == null) {
-                            console.log("[debug] Null skip")
+                            //console.log("[debug] Null skip")
+                            //Älä tee mitään
                         } else {
                             //Yhdistys
                             var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsingif + "\n";
@@ -296,7 +297,7 @@ bot.on('ask.valinta', msg => {
                     return bot.sendMessage(msg.from.id, `Ei lähtöjä pysäkiltä.`);
                     var lahdot = undefined;
                 } else {
-                    console.log("[info] Viesti lähetetty!")
+                    console.log("[info] Vastaus lähetetty!")
                     return bot.sendMessage(msg.from.id, `Lähdöt pysäkiltä ${pysakki} - ${koodi}:\n\n${lahdot}`, { ask: 'valinta' });
                     var lahdot = undefined;
                 }
