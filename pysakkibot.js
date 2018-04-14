@@ -6,6 +6,9 @@ var TimeFormat = require('hh-mm-ss')
 var limit = require('limit-string-length');
 var fs = require('fs');
 
+//Aikaleimat logiin
+require('console-stamp')(console, '[HH:MM:ss.l]');
+
 //BotToken
 const bot = new TeleBot({
     token: 'TOKEN',
