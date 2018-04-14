@@ -8,7 +8,7 @@ var fs = require('fs');
 
 //BotToken
 const bot = new TeleBot({
-    token: 'token',
+    token: 'TOKEN',
     usePlugins: ['askUser']
 });
 //Muuttujat
@@ -156,19 +156,17 @@ bot.on(['location'], (msg, self) => {
 
 //-----------------------------------------------
 
-// Etsii jokaisesta viestistä pysäkin nimeä
-bot.on('/hae', msg => {
+// Etsii /hae viestistä pysäkin nimeä
+bot.on(['/hae', '/HAE'], msg => {
     let id = msg.from.id;
     let text = msg.text;
 
+    //Poistaa komennon (gi == case sensitive) idk tosi paska menetelmä tehä tää mut toimii
     text = text.replace('/hae ', '');
-
-    // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (text == "/start" || text == "/hide") {
-        //console.log("[info] /start tai /hide")
-        //Älä tee mitään
-    } else {
-        if (text == "/hae") {
+    text = text.replace('/', '')
+    text = text.replace(/hae /gi, "")
+    text = text.replace(/hae/gi, "")
+        if (text == "/hae" || text == "") {
             console.log("[info] Hae opastus lähetetty!")
             return bot.sendMessage(id, `Voit etsiä pysäkkejä kirjoittamalla /hae ja pysäkin nimi tai koodi samaan viestiin. Jos tarvitset lisäapua - /help!`)
         } else {
@@ -210,7 +208,6 @@ bot.on('/hae', msg => {
                         var pysakkivalinta = undefined;
                     }
                 })
-        }
     }
 })
 //-----------Vastaus edelliseen------------------
@@ -220,7 +217,7 @@ bot.on('ask.valinta', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help") {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" || valinta.includes("/HAE")) {
         //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {
@@ -275,7 +272,8 @@ bot.on('ask.valinta', msg => {
                         var headsign = jp.query(stopshaku, '$..headsign')
                         var headsingif = headsign[i]
                         if (headsingif == null) {
-                            console.log("[debug] Null skip")
+                            //console.log("[debug] Null skip")
+                            //Älä tee mitään
                         } else {
                             //Yhdistys
                             var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsingif + "\n";
@@ -296,7 +294,7 @@ bot.on('ask.valinta', msg => {
                     return bot.sendMessage(msg.from.id, `Ei lähtöjä pysäkiltä.`);
                     var lahdot = undefined;
                 } else {
-                    console.log("[info] Viesti lähetetty!")
+                    console.log("[info] Vastaus lähetetty!")
                     return bot.sendMessage(msg.from.id, `Lähdöt pysäkiltä ${pysakki} - ${koodi}:\n\n${lahdot}`, { ask: 'valinta' });
                     var lahdot = undefined;
                 }
@@ -304,6 +302,34 @@ bot.on('ask.valinta', msg => {
             })
     }
 });
+bot.on('/linja', msg => {
+    let id = msg.from.id;
+    let text = msg.text;
+
+    text = text.replace('/linja ', '');
+
+    if (text == "/linja" ) {
+        console.log("[info] Linja opastus lähetetty!")
+        return bot.sendMessage(id, `Voit etsiä linjoja kirjoittamalla /linja ja linjan tunnuksen samaan viestiin. Jos tarvitset lisäapua - /help!`)
+    } else {
+        const querygetlinestops = `{
+            
+        }
+        
+        `
+
+
+
+
+    }
+    return bot.sendMessage(
+        msg.from.id, `Linja ${text} on aik paske`
+    );
+});
+
+
+
+
 
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
