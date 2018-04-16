@@ -6,6 +6,9 @@ var TimeFormat = require('hh-mm-ss')
 var limit = require('limit-string-length');
 var fs = require('fs');
 
+//Aikaleimat logiin
+require('console-stamp')(console, '[HH:MM:ss.l]');
+
 //BotToken
 const bot = new TeleBot({
     token: 'TOKEN',
@@ -156,24 +159,23 @@ bot.on(['location'], (msg, self) => {
 
 //-----------------------------------------------
 
-// Etsii jokaisesta viestistä pysäkin nimeä
-bot.on('/hae', msg => {
+// Etsii /hae viestistä pysäkin nimeä
+bot.on(['/hae', '/HAE'], msg => {
     let id = msg.from.id;
     let text = msg.text;
 
+    //Poistaa komennon (gi == case sensitive) idk tosi paska menetelmä tehä tää mut toimii
     text = text.replace('/hae ', '');
-
+    text = text.replace('/', '')
+    text = text.replace(/hae /gi, "")
+    text = text.replace(/hae/gi, "")
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (text == "/start" || text == "/hide") {
-        //console.log("[info] /start tai /hide")
-        //Älä tee mitään
+    if (text == "/hae" || text == "") {
+        console.log("[info] Hae opastus lähetetty!")
+        return bot.sendMessage(id, `Voit etsiä pysäkkejä kirjoittamalla /hae ja pysäkin nimi tai koodi samaan viestiin. Jos tarvitset lisäapua - /help!`)
     } else {
-        if (text == "/hae") {
-            console.log("[info] Hae opastus lähetetty!")
-            return bot.sendMessage(id, `Voit etsiä pysäkkejä kirjoittamalla /hae ja pysäkin nimi tai koodi samaan viestiin. Jos tarvitset lisäapua - /help!`)
-        } else {
-            //Hakulause
-            const query = `{
+        //Hakulause
+        const query = `{
 	    stops(name: "${text}") {
         gtfsId
         name
@@ -181,36 +183,35 @@ bot.on('/hae', msg => {
         }
         }`
 
-            //Hakulauseen suoritus
-            return request(digiAPI, query)
-                .then(function (data) {
-                    var vastaus = JSON.stringify(data);
-                    //Jos pysäkkiä ei löydy
-                    if (vastaus == vaaravastaus) {
-                        console.log("[info] Viesti lähetetty! (Pysäkkejä ei löytynyt)")
-                        return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
-                    } else {
-                        //Hakee pyäkit ja koodit niille
-                        var pysakit = jp.query(data, '$..name')
-                        var koodit = jp.query(data, '$..code')
-                        //Erittelee pysäkit ja yhdistää koodit
-                        for (i = 0; i < pysakit.length; i += 1) {
-                            var pk = "/" + koodit[i] + " " + pysakit[i] + " - " + koodit[i] + "\n"
-                            //Tallentaa muuttujaan pysäkit + koodit viestiä varten
-                            if (pysakkivalinta == null) {
-                                pysakkivalinta = pk;
-                            } else {
-                                pysakkivalinta = pysakkivalinta += pk;
-                            }
+        //Hakulauseen suoritus
+        return request(digiAPI, query)
+            .then(function (data) {
+                var vastaus = JSON.stringify(data);
+                //Jos pysäkkiä ei löydy
+                if (vastaus == vaaravastaus) {
+                    console.log("[info] Viesti lähetetty! (Pysäkkejä ei löytynyt)")
+                    return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
+                } else {
+                    //Hakee pyäkit ja koodit niille
+                    var pysakit = jp.query(data, '$..name')
+                    var koodit = jp.query(data, '$..code')
+                    //Erittelee pysäkit ja yhdistää koodit
+                    for (i = 0; i < pysakit.length; i += 1) {
+                        var pk = "/" + koodit[i] + " " + pysakit[i] + " - " + koodit[i] + "\n"
+                        //Tallentaa muuttujaan pysäkit + koodit viestiä varten
+                        if (pysakkivalinta == null) {
+                            pysakkivalinta = pk;
+                        } else {
+                            pysakkivalinta = pysakkivalinta += pk;
                         }
-                        //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
-                        const id = msg.from.id;
-                        console.log("[info] Valinnat lähetetty!")
-                        return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'valinta' });
-                        var pysakkivalinta = undefined;
                     }
-                })
-        }
+                    //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
+                    const id = msg.from.id;
+                    console.log("[info] Valinnat lähetetty!")
+                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'valinta' });
+                    var pysakkivalinta = undefined;
+                }
+            })
     }
 })
 //-----------Vastaus edelliseen------------------
@@ -220,7 +221,7 @@ bot.on('ask.valinta', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" ) {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" || valinta.includes("/HAE")) {
         //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {

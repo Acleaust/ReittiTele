@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Acleaust/ReittiTele#readme",
   "dependencies": {
     "axios": "^0.17.1",
+    "console-stamp": "^0.2.6",
     "defiant.js": "^1.4.4",
     "delay": "^2.0.0",
     "es6-promise": "^4.2.2",
