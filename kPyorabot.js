@@ -3,9 +3,13 @@ const TeleBot = require('telebot');
 const { request } = require('graphql-request')
 var jp = require('jsonpath');
 
+//Aikaleimat logiin
+require('console-stamp')(console, '[HH:MM:ss.l]');
+
+
 //BotToken
 const bot = new TeleBot({
-    token: 'TOKEN',
+    token: '532778098:AAFNqqjYlsBMCY2OJxLFLNAi6mDJSnsm4VA',
     usePlugins: ['askUser']
 });
 
