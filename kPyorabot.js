@@ -9,7 +9,7 @@ require('console-stamp')(console, '[HH:MM:ss.l]');
 
 //BotToken
 const bot = new TeleBot({
-    token: '532778098:AAFNqqjYlsBMCY2OJxLFLNAi6mDJSnsm4VA',
+    token: 'TOKEN',
     usePlugins: ['askUser']
 });
 

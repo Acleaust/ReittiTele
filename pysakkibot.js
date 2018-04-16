@@ -11,7 +11,7 @@ require('console-stamp')(console, '[HH:MM:ss.l]');
 
 //BotToken
 const bot = new TeleBot({
-    token: '503339568:AAEe7BwHGLOy4C46g3thwD1HGbyPB2Orp1I',
+    token: 'TOKEN',
     usePlugins: ['askUser']
 });
 //Muuttujat
