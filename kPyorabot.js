@@ -5,7 +5,7 @@ var jp = require('jsonpath');
 
 //BotToken
 const bot = new TeleBot({
-    token: '532778098:AAFxFPvu-F60nUOVPcKVFp0qZ4iiwSJ3_0c',
+    token: 'TOKEN',
     usePlugins: ['askUser']
 });
 
