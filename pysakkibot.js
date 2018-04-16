@@ -295,7 +295,7 @@ bot.on('ask.valinta', msg => {
                 }
                 if (lahdot == undefined) {
                     console.log("[info] Ei lähtöjä.")
-                    return bot.sendMessage(msg.from.id, `Ei lähtöjä pysäkiltä.`);
+                    return bot.sendMessage(msg.from.id, `Ei lähtöjä pysäkiltä.`, { ask: 'valinta' });
                     var lahdot = undefined;
                 } else {
                     console.log("[info] Vastaus lähetetty!")
