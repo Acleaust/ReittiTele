@@ -198,7 +198,6 @@ function valintafunktio(chatId, messageId, valinta) {
 
 //---------- Minifunktiot ----------
 
-<<<<<<< HEAD
 
 
 //---------- Kysymykset ----------
@@ -234,39 +233,6 @@ bot.on('ask.askpysakkivalinta', msg => {
 });
 
 //---------- Location ----------
-=======
-//linja
-/*
-bot.on(['/LINJA', '/linja'], msg => {
-
-if (text == "/hae" || text == "") {
-    console.log("[info] Hae opastus lähetetty!")
-    return bot.sendMessage(id, `Voit etsiä linjojen vain helsingissä atm.....`)
-} else {
-    //Hakulause
-    const query = `{
-    stops(name: "10${text}") {
-    gtfsId
-    name
-    code
-    }
-    }`
-
-    var stops = jp.query('$..stops')
-   
-    
-}
-if(stops == undefined){
-    return bot.sendMessage(id, "ei löydy");
-}else{
-return bot.sendMessage(id, stops);
-var stops = undefined
-
-}
-)}
-*/
-//Käyttäjän sijainnista
->>>>>>> cefd0d74be73d5601dce8581869ff33f94760f18
 bot.on(['location'], (msg, self) => {
     let id = msg.from.id;
     let text = msg.text;
@@ -377,167 +343,7 @@ bot.on(['location'], (msg, self) => {
         })
 });
 
-<<<<<<< HEAD
 //---------- Muut komennot ----------
-=======
-//-----------------------------------------------
-
-// Etsii /hae viestistä pysäkin nimeä
-bot.on(['/hae', '/HAE'], msg => {
-   
-        let id = msg.from.id;
-        let text = msg.text;
- 
-
-    //Poistaa komennon (gi == case sensitive) idk tosi paska menetelmä tehä tää mut toimii
-    text = text.replace('/hae ', '');
-    text = text.replace('/', '')
-    text = text.replace(/hae /gi, "")
-    text = text.replace(/hae/gi, "")
-
-    //poistaa mahdollisesti haitalliset merkit
- if(text.includes("{") || text.includes("}") || text.includes(")") || text.includes("(") || text.includes(")") || text.includes("'") || text.includes('"') || text.includes("]") || text.includes("[")){
- text = "";
- }
-    // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (text == "/hae" || text == "") {
-        console.log("[info] Hae opastus lähetetty!")
-        return bot.sendMessage(id, `Voit etsiä pysäkkejä kirjoittamalla /hae ja pysäkin nimi tai koodi samaan viestiin. Jos tarvitset lisäapua - /help!`)
-    } else {
-        //Hakulause
-        const query = `{
-	    stops(name: "${text}") {
-        gtfsId
-        name
-        code
-        }
-        }`
-
-        //Hakulauseen suoritus
-        return request(digiAPI, query)
-            .then(function (data) {
-                var vastaus = JSON.stringify(data);
-                //Jos pysäkkiä ei löydy
-                if (vastaus == vaaravastaus) {
-                    console.log("[info] Viesti lähetetty! (Pysäkkejä ei löytynyt)")
-                    return bot.sendMessage(id, `Pysäkkiä "${text}" ei valitettavasti löydy.`);
-                } else {
-                    //Hakee pyäkit ja koodit niille
-                    var pysakit = jp.query(data, '$..name')
-                    var koodit = jp.query(data, '$..code')
-                    //Erittelee pysäkit ja yhdistää koodit
-                    for (i = 0; i < pysakit.length; i += 1) {
-                        var pk = "/" + koodit[i] + " " + pysakit[i] + " - " + koodit[i] + "\n"
-                        //Tallentaa muuttujaan pysäkit + koodit viestiä varten
-                        if (pysakkivalinta == null) {
-                            pysakkivalinta = pk;
-                        } else {
-                            pysakkivalinta = pysakkivalinta += pk;
-                        }
-                    }
-                    //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
-                    const id = msg.from.id;
-                    console.log("[info] Valinnat lähetetty!")
-                    return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'valinta' });
-                    var pysakkivalinta = undefined;
-                }
-            })
-    }
-})
-//-----------Vastaus edelliseen------------------
-//Vastaus
-bot.on('ask.valinta', msg => {
-    const id = msg.from.id;
-    const valinta = msg.text;
-
-    // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" || valinta.includes("/HAE") || valinta.includes("{")  || valinta.includes("}")  || valinta.includes("'") || valinta.includes(""))  {
-        //console.log("[info] /start tai /hide")
-        
-        //Älä tee mitään
-    } else {
-        valintavastaus = valinta.replace('/', '');
-
-        const querygetstoptimesforstops = `{
-            stops(name: "${valintavastaus}") {
-              name
-              code
-              stoptimesWithoutPatterns (numberOfDepartures: 8) {
-                realtimeDeparture
-                headsign
-                trip {
-                  pattern {
-                    route {
-                      shortName
-                    }
-                  }
-                }
-              }
-            }
-          }`
-
-        //Hakulauseen suoritus
-        return request(digiAPI, querygetstoptimesforstops)
-            .then(function (data) {
-                var vastaus = JSON.stringify(data);
-                //Datan haku queryn vastauksesta
-                var stopshaku = jp.query(data, '$..stops')
-                var stoptimeshaku = jp.query(stopshaku, '$..stoptimesWithoutPatterns')
-                var realtimehaku = jp.query(data, '$..realtimeDeparture')
-
-                for (i = 0; i < realtimehaku.length; i += 1) {
-                    var stoptimesif = JSON.stringify(stoptimeshaku[i])
-                    var realtime = realtimehaku[i]
-                    if (stoptimesif == "[]") {
-                        //console.log("Hypätty yli")
-                        //Do nothing
-                    } else {
-                        //Pysäkin nimi
-                        var pysakki = jp.query(stopshaku, '$..name')
-                        var koodi = jp.query(stopshaku, '$..code')
-
-                        //ajan haku ja muunto tunneiksi ja sekunneiksi
-                        var realtime3 = Number(realtime)
-                        //Muunto
-                        var departuretime = TimeFormat.fromS(realtime3, 'hh:mm');
-                        var departuretimeshort = limit(departuretime, 5)
-                        //Hakee linjan numeron tai kirjaimen
-                        var numlet = jp.query(data, '$..shortName')
-                        //Hakee määränpään
-                        var headsign = jp.query(stopshaku, '$..headsign')
-                        var headsingif = headsign[i]
-                        if (headsingif == null) {
-                            //console.log("[debug] Null skip")
-                            //Älä tee mitään
-                        } else {
-                            //Yhdistys
-                            var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsingif + "\n";
-
-                            if (lahdot == null) {
-                                lahdot = yksittainenlahto;
-                                //console.log("Tyhjään lahtöön lisäys")
-                            } else {
-                                //console.log("Lahtöön lisäys")
-                                lahdot = lahdot + yksittainenlahto;
-                                //console.log(lahdot)
-                            }
-                        }
-                    }
-                }
-                if (lahdot == undefined) {
-                    console.log("[info] Ei lähtöjä.")
-                    return bot.sendMessage(msg.from.id, `Ei lähtöjä pysäkiltä.`, { ask: 'valinta' });
-                    var lahdot = undefined;
-                } else {
-                    console.log("[info] Vastaus lähetetty!")
-                    return bot.sendMessage(msg.from.id, `Lähdöt pysäkiltä ${pysakki} - ${koodi}:\n\n${lahdot}`, { ask: 'valinta' });
-                    var lahdot = undefined;
-                }
-                //return bot.sendMessage(id, `Valitsit pysäkin: ${ valintavastaus }`);
-            })
-    }
-});
->>>>>>> cefd0d74be73d5601dce8581869ff33f94760f18
 
 //Viesti /hide - piilottaa keyboardin
 bot.on('/hide', msg => {
