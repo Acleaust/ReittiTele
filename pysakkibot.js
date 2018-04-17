@@ -11,7 +11,7 @@ require('console-stamp')(console, 'HH:MM:ss');
 
 //BotToken
 const bot = new TeleBot({
-    token: 'TOKEN',
+    token: '535551085:AAGqrvl-v4YtJfpyXwH8-U-hqmrxFJfcBTc',
     usePlugins: ['askUser']
 });
 //Muuttujat
@@ -46,6 +46,36 @@ bot.on('/help', (msg) => {
 
 //Koko "pääohjelma"
 
+//linja
+/*
+bot.on(['/LINJA', '/linja'], msg => {
+
+if (text == "/hae" || text == "") {
+    console.log("[info] Hae opastus lähetetty!")
+    return bot.sendMessage(id, `Voit etsiä linjojen vain helsingissä atm.....`)
+} else {
+    //Hakulause
+    const query = `{
+    stops(name: "10${text}") {
+    gtfsId
+    name
+    code
+    }
+    }`
+
+    var stops = jp.query('$..stops')
+   
+    
+}
+if(stops == undefined){
+    return bot.sendMessage(id, "ei löydy");
+}else{
+return bot.sendMessage(id, stops);
+var stops = undefined
+
+}
+)}
+*/
 //Käyttäjän sijainnista
 bot.on(['location'], (msg, self) => {
     let id = msg.from.id;
@@ -173,12 +203,9 @@ bot.on(['/hae', '/HAE'], msg => {
     text = text.replace(/hae/gi, "")
 
     //poistaa mahdollisesti haitalliset merkit
-    text = text.replace('{','')
-    text = text.replace('}','')
-    text = text.replace('(','')
-    text = text.replace(')','')
-    text = text.replace('"','')
-    text = text.replace("'",'')
+ if(text.includes("{") || text.includes("}") || text.includes(")") || text.includes("(") || text.includes(")") || text.includes("'") || text.includes('"') || text.includes("]") || text.includes("[")){
+ text = "";
+ }
     // Tähän komennot joita jotka ei tee pysäkkihakua
     if (text == "/hae" || text == "") {
         console.log("[info] Hae opastus lähetetty!")
@@ -292,7 +319,7 @@ bot.on('ask.valinta', msg => {
                         } else {
                             //Yhdistys
                             var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsingif + "\n";
-                            
+
                             if (lahdot == null) {
                                 lahdot = yksittainenlahto;
                                 //console.log("Tyhjään lahtöön lisäys")
