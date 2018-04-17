@@ -51,7 +51,6 @@ bot.on('/hae', msg => {
         console.log("[info] Kysytty pysäkkiä.")
         return bot.sendMessage(msg.from.id, 'Anna pysäkin nimi tai koodi 😄', { ask: 'pysakkinimi' }).then(re => { })
     } else {
-
         console.log("[info] Hetkinen...")
         return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
 
