@@ -116,6 +116,12 @@ bot.on(['location'], (msg, self) => {
 
 //Asema komento
 bot.on('/asema', (msg) => {
+    let id = msg.from.id;
+    let text = msg.text;
+    
+    text2 = text.replace('/asema ', '');
+
+
     console.log("[info] /asema viesti lähetetty!")
     return bot.sendMessage(msg.from.id, `WIP`)
 })

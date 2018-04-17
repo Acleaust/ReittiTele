@@ -281,7 +281,7 @@ bot.on('ask.valinta', msg => {
                         } else {
                             //Yhdistys
                             var yksittainenlahto = departuretimeshort + "  " + numlet[i] + " " + headsingif + "\n";
-
+                            
                             if (lahdot == null) {
                                 lahdot = yksittainenlahto;
                                 //console.log("Tyhjään lahtöön lisäys")
