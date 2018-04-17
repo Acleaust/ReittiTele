@@ -7,7 +7,7 @@ var limit = require('limit-string-length');
 var fs = require('fs');
 
 //Aikaleimat logiin
-require('console-stamp')(console, '[HH:MM:ss.l]');
+require('console-stamp')(console, 'HH:MM:ss');
 
 //BotToken
 const bot = new TeleBot({
@@ -61,7 +61,7 @@ bot.on(['location'], (msg, self) => {
         places: nearest(
         lat: ${latitude},
         lon: ${longitude},
-        maxDistance: 300, 
+        maxDistance: 500, 
         maxResults: 20,
         first:20,
         filterByPlaceTypes: DEPARTURE_ROW
@@ -258,7 +258,7 @@ bot.on('ask.valinta', msg => {
                     var stoptimesif = JSON.stringify(stoptimeshaku[i])
                     var realtime = realtimehaku[i]
                     if (stoptimesif == "[]") {
-                        console.log("Hypätty yli")
+                        //console.log("Hypätty yli")
                         //Do nothing
                     } else {
                         //Pysäkin nimi
