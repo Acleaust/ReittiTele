@@ -32,6 +32,6 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-relay": "^1.4.1",
-    "telebot": "^1.2.3"
+    "telebot": "^1.2.6"
   }
 }

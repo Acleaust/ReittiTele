@@ -161,14 +161,24 @@ bot.on(['location'], (msg, self) => {
 
 // Etsii /hae viestistä pysäkin nimeä
 bot.on(['/hae', '/HAE'], msg => {
-    let id = msg.from.id;
-    let text = msg.text;
+   
+        let id = msg.from.id;
+        let text = msg.text;
+ 
 
     //Poistaa komennon (gi == case sensitive) idk tosi paska menetelmä tehä tää mut toimii
     text = text.replace('/hae ', '');
     text = text.replace('/', '')
     text = text.replace(/hae /gi, "")
     text = text.replace(/hae/gi, "")
+
+    //poistaa mahdollisesti haitalliset merkit
+    text = text.replace('{','')
+    text = text.replace('}','')
+    text = text.replace('(','')
+    text = text.replace(')','')
+    text = text.replace('"','')
+    text = text.replace("'",'')
     // Tähän komennot joita jotka ei tee pysäkkihakua
     if (text == "/hae" || text == "") {
         console.log("[info] Hae opastus lähetetty!")
@@ -221,8 +231,9 @@ bot.on('ask.valinta', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" || valinta.includes("/HAE")) {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" || valinta.includes("/HAE") || valinta.includes("{")  || valinta.includes("}")  || valinta.includes("'") || valinta.includes(""))  {
         //console.log("[info] /start tai /hide")
+        
         //Älä tee mitään
     } else {
         valintavastaus = valinta.replace('/', '');
