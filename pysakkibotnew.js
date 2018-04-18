@@ -136,7 +136,6 @@ function valintafunktio(chatId, messageId, valinta) {
     //Hakulauseen suoritus
     return request(digiAPI, querygetstoptimesforstops)
         .then(function (data) {
-            var vastaus = JSON.stringify(data);
             //Datan haku queryn vastauksesta
             var stopshaku = jp.query(data, '$..stops')
             var stoptimeshaku = jp.query(stopshaku, '$..stoptimesWithoutPatterns')
