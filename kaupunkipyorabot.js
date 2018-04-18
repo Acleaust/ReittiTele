@@ -31,7 +31,7 @@ bot.on('text', function (msg) {
 
 bot.on('/start', (msg) => {
     console.log("[info] Start viesti lähetetty!")
-    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään Kaupunkipyöräbottia!\n\nVoit lähettää minulle sijainnin ja saat lähellä olevat kaupunkipyöräasemat ja saatavalla olevien pyörien määrän! 😃 `); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään Kaupunkipyöräbottia!\n\nVoit tehdä /asema ja aseman numeron niin saat aseman sijainnin ja asemalla olevine paikkojen ja pyörien lukumäärän.\n\nVoit lähettää minulle sijainnin ja saat lähellä olevat kaupunkipyöräasemat ja saatavalla olevien pyörien määrän! 😃 `); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 bot.on('/help', (msg) => {
@@ -44,7 +44,7 @@ bot.on('/asema', (msg) => {
 
     if (text == "/asema") {
         console.log("[info] Kysytty aseman numeroa.")
-        return bot.sendMessage(msg.from.id, 'Anna aseman numero 😄', { ask: 'asemankoodi' }).then(re => { })
+        return bot.sendMessage(msg.from.id, 'Anna aseman numero 😊', { ask: 'asemankoodi' }).then(re => { })
     } else {
         console.log("[info] Hetkinen...")
         return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
@@ -93,16 +93,40 @@ function asemahaku(chatId, messageId, viesti) {
     return request(digiAPI, queryasemahaku)
         .then(function (data) {
             var vastaus = JSON.stringify(data);
+            var status = jp.query(data, '$..state')
+            var statusif = JSON.stringify(status)
             if (vastaus == wrongasemahaku) {
                 console.log("[info] Asemaa ei löydy")
-                return bot.sendMessage(chatId, `Asemaa ${viesti} ei löydy 😞`);
+                return bot.editMessageText({ chatId, messageId }, `Asemaa ${viesti} ei löydy 😞`);
             } else {
+                if (statusif == '["Station off"]') {
+                    console.log("[info] Asema ei ole käytössä.")
+                    return bot.editMessageText({ chatId, messageId }, `Asema ${viesti} ei ole käytössä 😞`);
+                    //console.log("Hypätty yli!")
+                } else {
+                    //Hakee datan
+                    var name = jp.query(data, '$..name')
+                    var code = jp.query(data, '$..stationId')
+                    var spacesAvailable = jp.query(data, '$..spacesAvailable')
+                    var bikesAvailable = jp.query(data, '$..bikesAvailable')
+                    var lat = jp.query(data, '$..lat')
+                    var lon = jp.query(data, '$..lon')
 
+                    var lat = JSON.stringify(lat)
+                    var lon = JSON.stringify(lon)
+
+                    var lat = lat.replace('[', '')
+                    var lat = lat.replace(']', '')
+                    var lon = lon.replace('[', '')
+                    var lon = lon.replace(']', '')
+
+                    var haettuasema = "Asema "+ code + " - " + name + " 🚲\n\nPyöriä saatavilla: " + bikesAvailable + "\nPaikkoja vapaana: " + spacesAvailable;
+                }
             }
+            bot.editMessageText({ chatId, messageId }, `${haettuasema}`);
+            return bot.sendLocation(chatId, [lat, lon])
         })
 }
-
-
 
 //---------- Location ----------
 
@@ -182,7 +206,7 @@ bot.on(['location'], (msg, self) => {
                     return bot.sendMessage(msg.from.id, `Läheltäsi ei löytynyt käytössä olevia asemia 😞`)
                 } else {
                     console.log("[info] Asemat lähetetty!")
-                    return bot.sendMessage(msg.from.id, `Kaupunkipyöräasemat lähelläsi:\n\n${asemat}`)
+                    return bot.sendMessage(msg.from.id, `Kaupunkipyöräasemat lähelläsi: 🚲\n\n${asemat}`)
                     var asemat = undefined
                 }
             }
