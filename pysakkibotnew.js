@@ -61,7 +61,7 @@ bot.on('/hae', msg => {
             text = text.replace(/hae/gi, "")
 
             //Kutuu funktion
-            pysakkihaku(msg.from.id, re.result.message_id, text);
+            pysakkihaku(msg.from.id, re.message_id, text);
         })
     }
 });
@@ -210,7 +210,7 @@ bot.on('ask.pysakkinimi', msg => {
         console.log("[info] Hetkinen...")
         return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
 
-            pysakkihaku(msg.from.id, re.result.message_id, text);
+            pysakkihaku(msg.from.id, re.message_id, text);
         })
     }
 });
@@ -226,7 +226,7 @@ bot.on('ask.askpysakkivalinta', msg => {
         console.log("[info] Haetaan aikatauluja...")
         return bot.sendMessage(msg.from.id, 'Haetaan aikatauluja...').then(re => {
 
-            valintafunktio(msg.from.id, re.result.message_id, valinta);
+            valintafunktio(msg.from.id, re.message_id, valinta);
         })
     }
 });
