@@ -4,7 +4,6 @@
 
 Telegram botti, jolla saa HSL aikatauluja suoraan telegramiin! Nyt myös kaupunkipyörät!
 
-### Ohjeet
 ###### Pysäkkibot
 [Klikkaa tästä niin pääset käyttämään bottia!](http://t.me/pysakkibot)
 ###### Kaupunkipyöräbot
