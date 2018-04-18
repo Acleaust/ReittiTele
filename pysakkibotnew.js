@@ -220,15 +220,19 @@ bot.on('ask.askpysakkivalinta', msg => {
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
     if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja") {
-        //console.log("[info] /start tai /hide")
         //Älä tee mitään
     } else {
+        if(valinta.includes("/")){
+
         console.log("[info] Haetaan aikatauluja...")
         return bot.sendMessage(msg.from.id, 'Haetaan aikatauluja...').then(re => {
 
             valintafunktio(msg.from.id, re.message_id, valinta);
         })
-    }
+    }else{
+        bot.sendMessage(msg.from.id, ``, { ask: 'askpysakkivalinta' }).catch(error => console.log('[info] Ei pysäkin koodia!'));
+        //Do nothing
+    }}
 });
 
 //---------- Location ----------
@@ -356,6 +360,10 @@ bot.on('sticker', (msg) => {
     console.log(`[sticker] ${msg.chat.id}`)
     return msg.reply.sticker('img/1.webp', { asReply: true });
 });
+
+//---------- Testi ----------
+
+
 
 //Sovelluksen pyöritys. Älä poista!
 bot.start();
