@@ -127,6 +127,10 @@ function asemahaku(chatId, messageId, viesti) {
             bot.editMessageText({ chatId, messageId }, `${haettuasema}`);
             return bot.sendLocation(chatId, [lat, lon])
         })
+        .catch(err => {
+            console.log("[ERROR] GraphQL error")
+            return bot.editMessageText({ chatId, messageId }, `Ongelma pyynnössä. Kokeile uudestaan!`)
+        })
 };
 
 //---------- Location ----------
