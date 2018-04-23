@@ -207,7 +207,8 @@ bot.on(['/hae', '/HAE'], msg => {
                         return bot.sendMessage(id, `Etsit pysäkkiä "${text}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'valinta' });
                         var pysakkivalinta = undefined;
                     }
-                })
+                }
+            )
     }
 })
 //-----------Vastaus edelliseen------------------

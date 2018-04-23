@@ -100,8 +100,9 @@ function asemahaku(chatId, messageId, viesti) {
                 return bot.editMessageText({ chatId, messageId }, `Asemaa ${viesti} ei löydy 😞`);
             } else {
                 if (statusif == '["Station off"]') {
+                    var name = jp.query(data, '$..name')
                     console.log("[info] Asema ei ole käytössä.")
-                    return bot.editMessageText({ chatId, messageId }, `Asema ${viesti} ei ole käytössä 😞`);
+                    return bot.editMessageText({ chatId, messageId }, `Asema ${viesti} - ${name}, ei ole käytössä 😞`);
                     //console.log("Hypätty yli!")
                 } else {
                     //Hakee datan
@@ -126,7 +127,7 @@ function asemahaku(chatId, messageId, viesti) {
             bot.editMessageText({ chatId, messageId }, `${haettuasema}`);
             return bot.sendLocation(chatId, [lat, lon])
         })
-}
+};
 
 //---------- Location ----------
 

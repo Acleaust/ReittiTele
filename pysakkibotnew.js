@@ -108,6 +108,11 @@ function pysakkihaku(chatId, messageId, viesti) {
                 //return bot.sendMessage(chatId , `Etsit pysäkkiä "${viesti}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'askpysakkivalinta' })
                 var pysakkivalinta = undefined;
             }
+        }
+        )
+        .catch(err => {
+            console.log("[ERROR] GraphQL error")
+            return bot.editMessageText({ chatId, messageId }, `Ongelma pyynnössä. Kokeile uudestaan!`)
         })
 };
 
@@ -192,6 +197,10 @@ function valintafunktio(chatId, messageId, valinta) {
                 var lahdot = undefined;
             }
         })
+        .catch(err => {
+            console.log("[ERROR] GraphQL error")
+            return bot.editMessageText({ chatId, messageId }, `Ongelma valinnassa. Kokeile uudestaan!`)
+        })
 }
 
 //---------- Minifunktiot ----------
@@ -221,17 +230,18 @@ bot.on('ask.askpysakkivalinta', msg => {
     if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja") {
         //Älä tee mitään
     } else {
-        if(valinta.includes("/")){
+        if (valinta.includes("/")) {
 
-        console.log("[info] Haetaan aikatauluja...")
-        return bot.sendMessage(msg.from.id, 'Haetaan aikatauluja...').then(re => {
+            console.log("[info] Haetaan aikatauluja...")
+            return bot.sendMessage(msg.from.id, 'Haetaan aikatauluja...').then(re => {
 
-            valintafunktio(msg.from.id, re.message_id, valinta);
-        })
-    }else{
-        bot.sendMessage(msg.from.id, ``, { ask: 'askpysakkivalinta' }).catch(error => console.log('[info] Ei pysäkin koodia!'));
-        //Do nothing
-    }}
+                valintafunktio(msg.from.id, re.message_id, valinta);
+            })
+        } else {
+            bot.sendMessage(msg.from.id, ``, { ask: 'askpysakkivalinta' }).catch(error => console.log('[info] Ei pysäkin koodia!'));
+            //Do nothing
+        }
+    }
 });
 
 //---------- Location ----------
