@@ -3,7 +3,7 @@ const TeleBot = require('telebot');
 const { request } = require('graphql-request')
 var jp = require('jsonpath');
 
-//Aikaleimat logiin
+//Aikaleimat konsoliin
 require('console-stamp')(console, 'HH:MM:ss');
 
 //BotToken
@@ -36,7 +36,7 @@ bot.on('/start', (msg) => {
 
 bot.on('/help', (msg) => {
     console.log("[info] Help viesti lähetetty!")
-    return bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoit lähettäää botille sijainnin. Saat vastaukseksi lähimmät asemat ja pyörien saatavuudet.\n\nLisää komentoja tulee myöhemmin.`); //Vastaa kun käyttäjä käyttää /help komentoa
+    return bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoit lähettäää botille sijainnin. Saat vastaukseksi lähimmät asemat ja pyörien saatavuudet.\n\nVoit etsiä tiettyä kaupunkipyöräasemaa tekemällä "/asema" ja kirjoittamalla aseman numeron "019" ja saat aseman tiedot ja sijainnin.\n\nMukavaa matkaa! 😃`); //Vastaa kun käyttäjä käyttää /help komentoa
 });
 
 bot.on('/asema', (msg) => {

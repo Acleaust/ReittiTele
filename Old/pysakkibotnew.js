@@ -37,10 +37,23 @@ bot.on('/start', (msg) => {
 
 bot.on('/help', (msg) => {
     console.log("[info] Help viesti lähetetty!")
-    return bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoi etsiä pysäkkejä kirjoittamalla "/hae" ja pysäkin nimen.\nEsim. "/hae keilaniemi"\n\nVoit myös lähettää sijaintisi ja saadä lähistöltä lähdöt. Jos lähelläsi ei ole pysäkkejä, kokeile lähettää sijainti pysäkin läheltä.\n\nToivottavasti pääset jatkamaan näillä ohjeilla! 😊`); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoi etsiä pysäkkejä kirjoittamalla "/hae" ja pysäkin nimen.\nEsim. "/hae keilaniemi"\n\nVoit myös lähettää sijaintisi ja saadä lähistöltä lähdöt. Jos lähelläsi ei ole pysäkkejä, kokeile lähettää sijainti pysäkin läheltä.\n\nMukavaa matkaa! 😊`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
-//---------- Pääohjelma ----------
+//Viesti /hide - piilottaa keyboardin
+bot.on('/hide', msg => {
+    return bot.sendMessage(
+        msg.from.id, 'Pysäkkivaihtoehdot piilotettu', { replyMarkup: 'hide' }
+    );
+});
+
+//Vastaa stikkeriin stikkerillä
+bot.on('sticker', (msg) => {
+    console.log(`[sticker] ${msg.chat.id}`)
+    return msg.reply.sticker('img/1.webp', { asReply: true });
+});
+
+//---------- MAIN ----------
 
 //---------- /hae ----------
 
@@ -56,13 +69,47 @@ bot.on('/hae', msg => {
 
             //Poistaa komennon (gi == case sensitive) idk tosi paska menetelmä tehä tää mut toimii
             text = text.replace('/hae ', '');
-            text = text.replace('/', '')
-            text = text.replace(/hae /gi, "")
-            text = text.replace(/hae/gi, "")
 
             //Kutuu funktion
             pysakkihaku(msg.from.id, re.message_id, text);
         })
+    }
+});
+
+//---------- Kysymykset ----------
+
+bot.on('ask.pysakkinimi', msg => {
+    let text = msg.text;
+
+    if (text == "/start" || text == undefined || text.includes("/hae") || text == "/help" || text == "/linja") {
+        //Älä tee mitään
+    } else {
+        console.log("[info] Hetkinen...")
+        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
+
+            pysakkihaku(msg.from.id, re.message_id, text);
+        })
+    }
+});
+
+bot.on('ask.askpysakkivalinta', msg => {
+    const valinta = msg.text;
+
+    // Tähän komennot joita jotka ei tee pysäkkihakua
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja") {
+        //Älä tee mitään
+    } else {
+        if (valinta.includes("/")) {
+
+            console.log("[info] Haetaan aikatauluja...")
+            return bot.sendMessage(msg.from.id, 'Haetaan aikatauluja...').then(re => {
+
+                valintafunktio(msg.from.id, re.message_id, valinta);
+            })
+        } else {
+            bot.sendMessage(msg.from.id, ``, { ask: 'askpysakkivalinta' }).catch(error => console.log('[info] Ei pysäkin koodia!'));
+            //Do nothing
+        }
     }
 });
 
@@ -203,47 +250,6 @@ function valintafunktio(chatId, messageId, valinta) {
         })
 }
 
-//---------- Minifunktiot ----------
-
-
-
-//---------- Kysymykset ----------
-
-bot.on('ask.pysakkinimi', msg => {
-    let text = msg.text;
-
-    if (text == "/start" || text == undefined || text.includes("/hae") || text == "/help" || text == "/linja") {
-        //Älä tee mitään
-    } else {
-        console.log("[info] Hetkinen...")
-        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
-
-            pysakkihaku(msg.from.id, re.message_id, text);
-        })
-    }
-});
-
-bot.on('ask.askpysakkivalinta', msg => {
-    const valinta = msg.text;
-
-    // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja") {
-        //Älä tee mitään
-    } else {
-        if (valinta.includes("/")) {
-
-            console.log("[info] Haetaan aikatauluja...")
-            return bot.sendMessage(msg.from.id, 'Haetaan aikatauluja...').then(re => {
-
-                valintafunktio(msg.from.id, re.message_id, valinta);
-            })
-        } else {
-            bot.sendMessage(msg.from.id, ``, { ask: 'askpysakkivalinta' }).catch(error => console.log('[info] Ei pysäkin koodia!'));
-            //Do nothing
-        }
-    }
-});
-
 //---------- Location ----------
 bot.on(['location'], (msg, self) => {
     let id = msg.from.id;
@@ -354,25 +360,6 @@ bot.on(['location'], (msg, self) => {
             }
         })
 });
-
-//---------- Muut komennot ----------
-
-//Viesti /hide - piilottaa keyboardin
-bot.on('/hide', msg => {
-    return bot.sendMessage(
-        msg.from.id, 'Pysäkkivaihtoehdot piilotettu', { replyMarkup: 'hide' }
-    );
-});
-
-//Vastaa stikkeriin stikkerillä
-bot.on('sticker', (msg) => {
-    console.log(`[sticker] ${msg.chat.id}`)
-    return msg.reply.sticker('img/1.webp', { asReply: true });
-});
-
-//---------- Testi ----------
-
-
 
 //Sovelluksen pyöritys. Älä poista!
 bot.start();
