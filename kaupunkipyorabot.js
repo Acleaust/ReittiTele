@@ -194,10 +194,11 @@ bot.on(['location'], (msg, self) => {
                         //Hakee datan
                         var name = jp.query(node2, '$..name')
                         var code = jp.query(node2, '$..stationId')
+                        var distance = jp.query(node2, '$..distance')
                         var spacesAvailable = jp.query(node2, '$..spacesAvailable')
                         var bikesAvailable = jp.query(node2, '$..bikesAvailable')
                         //Yhdistää haetun datan
-                        var yksittainenasema = name + " - " + code + "\nPyöriä saatavilla: " + bikesAvailable + "/" + spacesAvailable + "\n\n"
+                        var yksittainenasema = name + "  " + code + " - "+ distance+ "m"+ "\nPyöriä saatavilla: " + bikesAvailable + "\nPaikkoja vapaana:" + spacesAvailable + "\n\n"
                         //Yhdistää asemat 
                         if (asemat == null) {
                             asemat = yksittainenasema;
