@@ -339,6 +339,10 @@ bot.on(['location'], (msg, self) => {
                             var departuretimeshort = departuretimeshort.replace('25:', '01:')
                         } if (realtime2 > 93600) {
                             var departuretimeshort = departuretimeshort.replace('26:', '02:')
+                        } if (realtime2 > 97200) {
+                            var departuretimeshort = departuretimeshort.replace('27:', '03:')
+                        } if (realtime2 > 100800) {
+                            var departuretimeshort = departuretimeshort.replace('28:', '04:')
                         }
                         //Hakee linjan numeron tai kirjaimen
                         var numlet = jp.query(node2, '$..shortName')
