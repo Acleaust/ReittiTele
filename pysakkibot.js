@@ -205,16 +205,20 @@ function valintafunktio(chatId, messageId, valinta) {
                     var koodi = jp.query(stopshaku, '$..code')
 
                     //ajan haku ja muunto tunneiksi ja sekunneiksi
-                    var realtime3 = Number(realtime)
+                    var realtimeNUM = Number(realtime)
                     //Muunto
-                    var departuretime = TimeFormat.fromS(realtime3, 'hh:mm');
+                    var departuretime = TimeFormat.fromS(realtimeNUM, 'hh:mm');
                     var departuretimeshort = limit(departuretime, 5)
-                    if (realtime3 > 86400) {
+                    if (realtimeNUM > 86400) {
                         var departuretimeshort = departuretimeshort.replace('24:', '00:') 
-                    } if (realtime3 > 90000) {
+                    } if (realtimeNUM > 90000) {
                         var departuretimeshort = departuretimeshort.replace('25:', '01:')
-                    } if (realtime3 > 93600) {
+                    } if (realtimeNUM > 93600) {
                         var departuretimeshort = departuretimeshort.replace('26:', '02:')
+                    } if (realtimeNUM > 97200) {
+                        var departuretimeshort = departuretimeshort.replace('27:', '03:')
+                    } if (realtimeNUM > 100800) {
+                        var departuretimeshort = departuretimeshort.replace('28:', '04:')
                     }
                     //Hakee linjan numeron tai kirjaimen
                     var numlet = jp.query(data, '$..shortName')
@@ -253,6 +257,7 @@ function valintafunktio(chatId, messageId, valinta) {
         })
         .catch(err => {
             console.log("[ERROR] GraphQL error")
+            console.log(err)
             return bot.editMessageText({ chatId, messageId }, `Ongelma valinnassa. Kokeile uudestaan!`)
         })
 }
@@ -329,19 +334,19 @@ bot.on(['location'], (msg, self) => {
                     } else {
                         //Ajan haku ja muunto tunneiksi ja minuuteiksi
                         var realtime = jp.query(stoptimes2, '$..realtimeDeparture')
-                        var realtime2 = Number(realtime)
+                        var realtimeNUM = Number(realtime)
                         //Muuttaa sekunnit tunneiksi ja minuuteiksi
-                        var departuretime = TimeFormat.fromS(realtime2, 'hh:mm');
+                        var departuretime = TimeFormat.fromS(realtimeNUM, 'hh:mm');
                         var departuretimeshort = limit(departuretime, 5)
-                        if (realtime2 > 86400) {
+                        if (realtimeNUM > 86400) {
                             var departuretimeshort = departuretimeshort.replace('24:', '00:') 
-                        } if (realtime2 > 90000) {
+                        } if (realtimeNUM > 90000) {
                             var departuretimeshort = departuretimeshort.replace('25:', '01:')
-                        } if (realtime2 > 93600) {
+                        } if (realtimeNUM > 93600) {
                             var departuretimeshort = departuretimeshort.replace('26:', '02:')
-                        } if (realtime2 > 97200) {
+                        } if (realtimeNUM > 97200) {
                             var departuretimeshort = departuretimeshort.replace('27:', '03:')
-                        } if (realtime2 > 100800) {
+                        } if (realtimeNUM > 100800) {
                             var departuretimeshort = departuretimeshort.replace('28:', '04:')
                         }
                         //Hakee linjan numeron tai kirjaimen
