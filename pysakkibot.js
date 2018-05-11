@@ -164,8 +164,14 @@ function pysakkihaku(chatId, messageId, viesti) {
 };
 
 function valintafunktio(chatId, messageId, valinta) {
+    if (valinta == '/') {
+        return bot.editMessageText({ chatId, messageId }, `"/" ei ole pysäkki. Kokeile uudestaan!`, { ask: 'askpysakkivalinta' });
+    }
     //Poistaa "/" merkin
     valintavastaus = valinta.replace('/', '');
+    if (valintavastaus.includes(' ')) {
+        valintavastaus = valintavastaus.replace(' ','')
+    }
     //Query
     const querygetstoptimesforstops = `{
             stops(name: "${valintavastaus}") {
