@@ -37,7 +37,12 @@ bot.on('/start', (msg) => {
 
 bot.on('/help', (msg) => {
     console.log("[info] Help viesti lähetetty!")
-    return bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoi etsiä pysäkkejä kirjoittamalla "/hae" ja pysäkin nimen.\nEsim. "/hae keilaniemi"\n\nVoit myös lähettää sijaintisi ja saadä lähistöltä lähdöt. Jos lähelläsi ei ole pysäkkejä, kokeile lähettää sijainti pysäkin läheltä.\n\nMukavaa matkaa! 😊`); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoi etsiä pysäkkejä kirjoittamalla "/hae" ja pysäkin nimen.\nEsim. "/hae keilaniemi"\n\nVoit myös lähettää sijaintisi ja saadä lähistöltä lähdöt. Jos lähelläsi ei ole pysäkkejä, kokeile lähettää sijainti pysäkin läheltä.\n\nJos löydät bugin voit reportoida sen tekemällä /bugi\n\nMukavaa matkaa! 😊`); //Vastaa kun käyttäjä käyttää /start komentoa
+});
+
+bot.on('/bugi', (msg) => {
+    console.log("[info] Help viesti lähetetty!")
+    return bot.sendMessage(msg.from.id, `${msg.from.first_name}, löysitkö bugin? Jos löysit bugin voit reportoida sen tänne: https://goo.gl/forms/o1dIISSchWKluJ8A2\n\nVoit myös ottaa yhteyttä kehittäjään laittamalla viestiä @ainkilainen\n\nMukavaa matkaa! 😊`); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 //Viesti /hide - piilottaa keyboardin
@@ -66,10 +71,8 @@ bot.on('/hae', msg => {
     } else {
         console.log("[info] Hetkinen...")
         return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
-
-            //Poistaa komennon (gi == case sensitive) idk tosi paska menetelmä tehä tää mut toimii
+            //Poistaa kauttaviivan
             text = text.replace('/hae ', '');
-
             //Kutuu funktion
             pysakkihaku(msg.from.id, re.message_id, text);
         })
@@ -170,7 +173,7 @@ function valintafunktio(chatId, messageId, valinta) {
     //Poistaa "/" merkin
     valintavastaus = valinta.replace('/', '');
     if (valintavastaus.includes(' ')) {
-        valintavastaus = valintavastaus.replace(' ','')
+        valintavastaus = valintavastaus.replace(' ', '')
     }
     //Query
     const querygetstoptimesforstops = `{
@@ -216,7 +219,7 @@ function valintafunktio(chatId, messageId, valinta) {
                     var departuretime = TimeFormat.fromS(realtimeNUM, 'hh:mm');
                     var departuretimeshort = limit(departuretime, 5)
                     if (realtimeNUM > 86400) {
-                        var departuretimeshort = departuretimeshort.replace('24:', '00:') 
+                        var departuretimeshort = departuretimeshort.replace('24:', '00:')
                     } if (realtimeNUM > 90000) {
                         var departuretimeshort = departuretimeshort.replace('25:', '01:')
                     } if (realtimeNUM > 93600) {
@@ -345,7 +348,7 @@ bot.on(['location'], (msg, self) => {
                         var departuretime = TimeFormat.fromS(realtimeNUM, 'hh:mm');
                         var departuretimeshort = limit(departuretime, 5)
                         if (realtimeNUM > 86400) {
-                            var departuretimeshort = departuretimeshort.replace('24:', '00:') 
+                            var departuretimeshort = departuretimeshort.replace('24:', '00:')
                         } if (realtimeNUM > 90000) {
                             var departuretimeshort = departuretimeshort.replace('25:', '01:')
                         } if (realtimeNUM > 93600) {
