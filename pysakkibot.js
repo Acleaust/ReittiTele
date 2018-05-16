@@ -61,7 +61,6 @@ bot.on('sticker', (msg) => {
 //---------- MAIN ----------
 
 //---------- /hae ----------
-
 bot.on('/hae', msg => {
     let text = msg.text;
 
@@ -75,6 +74,24 @@ bot.on('/hae', msg => {
             text = text.replace('/hae ', '');
             //Kutuu funktion
             pysakkihaku(msg.from.id, re.message_id, text);
+        })
+    }
+});
+
+//---------- /linja ----------
+bot.on('/linja', msg => {
+    let text = msg.text;
+
+    if (text == '/linja') {
+        console.log("[info] Kysytty linjaa.")
+        return bot.sendMessage(msg.from.id, 'Anna linjan tunnus 😄', { ask: 'linjatunnus' }).then(re => { })
+    } else {
+        console.log("[info] Hetkinen...")
+        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
+            //Poistaa kauttaviivan
+            text = text.replace('/linja ', '');
+            //Kutuu funktion
+            maaranpaat(msg.from.id, re.message_id, text);
         })
     }
 });
@@ -116,6 +133,21 @@ bot.on('ask.askpysakkivalinta', msg => {
     }
 });
 
+bot.on('ask.linjatunnus', msg => {
+    const valinta = msg.text;
+
+    // Tähän komennot joita jotka ei tee pysäkkihakua
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help") {
+        //Älä tee mitään
+    } else {
+
+            console.log("[info] Haetaan määränpäät...")
+            return bot.sendMessage(msg.from.id, 'Haetaan määränpäitä...').then(re => {
+
+                maaranpaat(msg.from.id, re.message_id, valinta);
+            })
+    }
+});
 //---------- Funktiot ----------
 
 function pysakkihaku(chatId, messageId, viesti) {
@@ -166,6 +198,7 @@ function pysakkihaku(chatId, messageId, viesti) {
         })
 };
 
+//Valintafunktio
 function valintafunktio(chatId, messageId, valinta) {
     if (valinta == '/') {
         return bot.editMessageText({ chatId, messageId }, `"/" ei ole pysäkki. Kokeile uudestaan!`, { ask: 'askpysakkivalinta' });
@@ -269,6 +302,45 @@ function valintafunktio(chatId, messageId, valinta) {
             console.log(err)
             return bot.editMessageText({ chatId, messageId }, `Ongelma valinnassa. Kokeile uudestaan!`)
         })
+}
+
+function maaranpaat(chatId, messageId, viesti) {
+
+    //Hakulause
+    const query = `{
+        routes(name: "${viesti}") {
+          id
+          shortName
+          longName
+          desc
+          patterns {
+            id
+            headsign
+          }
+        }
+      }`
+
+      return request(digiAPI, query)
+      .then(function (data) {
+        //Datan haku queryn vastauksesta
+        var desc = jp.query(data, '$..desc')
+        var shortNames = jp.query(data, '$..shortName')
+        var patterns = jp.query(data, '$..patterns')
+
+        for (i = 0; i < desc.length; i += 1) {
+            var shortName = shortNames[i];
+            var pattern = patterns[i];
+                if (shortName == viesti) {
+                    var maaranpaat = jp.query(pattern, '$..headsign')
+                    console.log(maaranpaat)
+                    var maaranpaa = maaranpaat[i]
+
+                    console.log(maaranpaa)
+                } else {
+
+                }
+        }
+      })
 }
 
 //---------- Location ----------
