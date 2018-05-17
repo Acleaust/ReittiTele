@@ -183,10 +183,14 @@ function pysakkihaku(chatId, messageId, viesti) {
                         pysakkivalinta = pysakkivalinta += pk;
                     }
                 }
+                let replyMarkup = bot.keyboard([
+                    ['/buttons'],
+                    ['/hide']
+                ], {resize: true});
                 //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
                 //console.log("[info] Valinnat lähetetty!")
-                bot.sendMessage(chatId, ``, { ask: 'askpysakkivalinta' }).catch(error => console.log('[info] Valinnat lähetetty!'));
-                return bot.editMessageText({ chatId, messageId }, `Etsit pysäkkiä "${viesti}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'askpysakkivalinta' })
+                bot.sendMessage(chatId, `Testi`, { replyMarkup , ask: 'askpysakkivalinta' }).catch(error => console.log('[info] Valinnat lähetetty!'));
+                return bot.editMessageText({ chatId, messageId }, `Etsit pysäkkiä "${viesti}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'askpysakkivalinta'})
                 //return bot.sendMessage(chatId , `Etsit pysäkkiä "${viesti}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'askpysakkivalinta' })
                 var pysakkivalinta = undefined;
             }
@@ -332,12 +336,15 @@ function maaranpaat(chatId, messageId, viesti) {
             var pattern = patterns[i];
                 if (shortName == viesti) {
                     var maaranpaat = jp.query(pattern, '$..headsign')
-                    console.log(maaranpaat)
-                    var maaranpaa = maaranpaat[i]
-
-                    console.log(maaranpaa)
+                    var iideeahaku = jp.query(pattern, '$..id')
+                    for (i = 0; i < maaranpaat.length; i += 1) {
+                        var maaranpaa = maaranpaat[i]
+                        var iidee = iideeahaku[i]
+                        console.log(maaranpaa)
+                        console.log(iidee)
+                    }
                 } else {
-
+                    //DO NOTHING
                 }
         }
       })
@@ -464,6 +471,8 @@ bot.on(['location'], (msg, self) => {
             }
         })
 });
+
+
 
 //Sovelluksen pyöritys. Älä poista!
 bot.start();
