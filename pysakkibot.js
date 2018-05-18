@@ -21,7 +21,9 @@ var pysakkivalinta;
 const LOCvaaravastaus = '{"places":{"edges":[]}}'
 const LOCvaaravastaus2 = '[]'
 var lahdot;
-
+var hetki = "Hetkinen..."
+var hetki2 = "Haetaan aikatauluja..."
+var admins = [81023943,86734737]
 //-----------------------------------------------
 
 // Logaa jokaisen sisääntulevan viestin consoliin
@@ -34,9 +36,9 @@ bot.on('/start', (msg) => {
     let replyMarkup = bot.keyboard([
         [bot.button('/hae'), bot.button('location', 'Sijaintisi mukaan 📍')],
         ['/hide']
-    ], {resize: true});
+    ], { resize: true });
     console.log("[info] Start viesti lähetetty!")
-    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\n\nVoit aloittaa käytön kirjoittamalla /hae ja pysäkin nimen tai koodin.\n\nVoit vaihtoehtoisesti myös lähettää sijaintisi ja saada lähistöltäsi seuraavat lähdöt!\n\nJos tarvitset lisää apua tee /help! 😄`, {replyMarkup}); //Vastaa kun käyttäjä käyttää /start komentoa
+    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\n\nVoit aloittaa käytön kirjoittamalla /hae ja pysäkin nimen tai koodin.\n\nVoit vaihtoehtoisesti myös lähettää sijaintisi ja saada lähistöltäsi seuraavat lähdöt!\n\nJos tarvitset lisää apua tee /help! 😄`, { replyMarkup }); //Vastaa kun käyttäjä käyttää /start komentoa
 });
 
 bot.on('/help', (msg) => {
@@ -68,11 +70,44 @@ bot.on('/menu', msg => {
     let replyMarkup = bot.keyboard([
         [bot.button('/hae'), bot.button('location', 'Sijaintisi mukaan 📍')],
         ['/hide']
-    ], {resize: true});
+    ], { resize: true });
 
-    return bot.sendMessage(msg.from.id, 'Valitse toiminto.', {replyMarkup});
-
+    return bot.sendMessage(msg.from.id, 'Valitse toiminto.', { replyMarkup });
 });
+bot.on('/admin', (msg) => {
+    if (msg.from.id == 81023943 || msg.from.id == 86734737) {
+        console.log("[info] Admin tunnistettu")
+        let replyMarkup = bot.keyboard([
+            ['/adminhairio'],
+            ['/hide']
+        ], {resize: true});
+        return bot.sendMessage(msg.from.id, `Admin menu:`, {replyMarkup})
+    } else {
+        console.log("[info] Adminia ei tunnistettu")
+    }
+});
+
+bot.on('/adminhairio', (msg) => {
+    if (msg.from.id == 81023943 || msg.from.id == 86734737) {
+        console.log("[info] Admin tunnistettu")
+        if (hetki == "Hetkinen...") {
+            hetki = "Hetkinen...\nHäiriö voi hidastaa hakua."
+            hetki2 = "Haetaan aikatauluja...\nHäiriö voi hidastaa hakua."
+            console.log("[info] Admin - Häiriö viesti lisätty!")
+            bot.sendMessage(81023943, `Häiriö lisätty.`);
+            return bot.sendMessage(86734737, `Häiriö lisätty.`);
+        } else {
+            hetki = "Hetkinen..."
+            hetki2 = "Haetaan aikatauluja..."
+            console.log("[info] Admin - Häiriö viesti poistettu!")
+            bot.sendMessage(81023943, `Häiriö poistettu.`);
+            return bot.sendMessage(86734737, `Häiriö poistettu.`);
+        }
+    } else {
+        console.log("[info] Adminia ei tunnistettu")
+    }
+});
+
 //---------- MAIN ----------
 
 //---------- /hae ----------
@@ -81,10 +116,10 @@ bot.on('/hae', msg => {
 
     if (text == '/hae') {
         console.log("[info] Kysytty pysäkkiä.")
-        return bot.sendMessage(msg.from.id, 'Anna pysäkin nimi tai koodi 😄', { replyMarkup: 'hide' , ask: 'pysakkinimi' }).then(re => { })
+        return bot.sendMessage(msg.from.id, 'Anna pysäkin nimi tai koodi 😄', { replyMarkup: 'hide', ask: 'pysakkinimi' }).then(re => { })
     } else {
         console.log("[info] Hetkinen...")
-        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
+        return bot.sendMessage(msg.from.id, `${hetki}`).then(re => {
             //Poistaa kauttaviivan
             text = text.replace('/hae ', '');
             //Kutuu funktion
@@ -99,10 +134,10 @@ bot.on('/linja', msg => {
 
     if (text == '/linja') {
         console.log("[info] Kysytty linjaa.")
-        return bot.sendMessage(msg.from.id, 'Anna linjan tunnus 😄', {replyMarkup: 'hide', ask: 'linjatunnus' }).then(re => { })
+        return bot.sendMessage(msg.from.id, 'Anna linjan tunnus 😄', { replyMarkup: 'hide', ask: 'linjatunnus' }).then(re => { })
     } else {
         console.log("[info] Hetkinen...")
-        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
+        return bot.sendMessage(msg.from.id, `${hetki}`).then(re => {
             //Poistaa kauttaviivan
             text = text.replace('/linja ', '');
             //Kutuu funktion
@@ -120,7 +155,7 @@ bot.on('ask.pysakkinimi', msg => {
         //Älä tee mitään
     } else {
         console.log("[info] Hetkinen...")
-        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
+        return bot.sendMessage(msg.from.id, `${hetki}`).then(re => {
 
             pysakkihaku(msg.from.id, re.message_id, text);
         })
@@ -137,7 +172,7 @@ bot.on('ask.askpysakkivalinta', msg => {
         if (valinta.includes("/")) {
 
             console.log("[info] Haetaan aikatauluja...")
-            return bot.sendMessage(msg.from.id, 'Haetaan aikatauluja...').then(re => {
+            return bot.sendMessage(msg.from.id, `${hetki2}`).then(re => {
 
                 valintafunktio(msg.from.id, re.message_id, valinta);
             })
@@ -152,15 +187,15 @@ bot.on('ask.linjatunnus', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help"|| valinta == "/menu") {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/menu") {
         //Älä tee mitään
     } else {
 
-            console.log("[info] Haetaan määränpäät...")
-            return bot.sendMessage(msg.from.id, 'Haetaan määränpäitä...').then(re => {
+        console.log("[info] Haetaan määränpäät...")
+        return bot.sendMessage(msg.from.id, 'Haetaan määränpäitä...').then(re => {
 
-                maaranpaat(msg.from.id, re.message_id, valinta);
-            })
+            maaranpaat(msg.from.id, re.message_id, valinta);
+        })
     }
 });
 //---------- Funktiot ----------
@@ -196,21 +231,21 @@ function pysakkihaku(chatId, messageId, viesti) {
                     if (pysakkivalinta == null) {
                         pysakkivalinta = pk;
                         var nappaimisto = []
-                        nappaimisto.push("/"+koodi)
+                        nappaimisto.push("/" + koodi)
                     } else {
                         pysakkivalinta = pysakkivalinta += pk;
-                        nappaimisto.push("/"+koodi)
+                        nappaimisto.push("/" + koodi)
                     }
                 }
                 nappaimisto2 = nappaimisto.splice(0, Math.ceil(nappaimisto.length / 2));
 
                 var nappaimistoStdAla = ['/hae', '/hide']
                 //Näppäimistö
-                let replyMarkup = bot.keyboard([nappaimisto2,nappaimisto,nappaimistoStdAla], {resize: true});
+                let replyMarkup = bot.keyboard([nappaimisto2, nappaimisto, nappaimistoStdAla], { resize: true });
                 //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
                 console.log("[info] Valinnat lähetetty!")
                 bot.editMessageText({ chatId, messageId }, `Etsit pysäkkiä "${viesti}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`)
-                return bot.sendMessage(chatId, `Voit valita pysäkin myös näppäimistöstä! 😉`, { replyMarkup , ask: 'askpysakkivalinta' })//.catch(error => console.log('[info] Valinnat lähetetty!'));
+                return bot.sendMessage(chatId, `Voit valita pysäkin myös näppäimistöstä! 😉`, { replyMarkup, ask: 'askpysakkivalinta' })//.catch(error => console.log('[info] Valinnat lähetetty!'));
                 //return bot.sendMessage(chatId , `Etsit pysäkkiä "${viesti}".\nValitse alla olevista vaihtoehdoita oikea pysäkki!\n\n${pysakkivalinta}`, { ask: 'askpysakkivalinta' })
                 var pysakkivalinta = undefined;
                 var nappaimisto = undefined;
@@ -345,16 +380,16 @@ function maaranpaat(chatId, messageId, viesti) {
         }
       }`
 
-      return request(digiAPI, query)
-      .then(function (data) {
-        //Datan haku queryn vastauksesta
-        var desc = jp.query(data, '$..desc')
-        var shortNames = jp.query(data, '$..shortName')
-        var patterns = jp.query(data, '$..patterns')
+    return request(digiAPI, query)
+        .then(function (data) {
+            //Datan haku queryn vastauksesta
+            var desc = jp.query(data, '$..desc')
+            var shortNames = jp.query(data, '$..shortName')
+            var patterns = jp.query(data, '$..patterns')
 
-        for (i = 0; i < desc.length; i += 1) {
-            var shortName = shortNames[i];
-            var pattern = patterns[i];
+            for (i = 0; i < desc.length; i += 1) {
+                var shortName = shortNames[i];
+                var pattern = patterns[i];
                 if (shortName == viesti) {
                     var maaranpaat = jp.query(pattern, '$..headsign')
                     var iideeahaku = jp.query(pattern, '$..id')
@@ -366,16 +401,16 @@ function maaranpaat(chatId, messageId, viesti) {
                         var maaranpaalista
                         if (maaranpaalista == undefined) {
                             maaranpaalista = maaranpaa + "\n"
-                        }else{
+                        } else {
                             maaranpaalista = maaranpaalista + maaranpaa
                         }
                     }
                 } else {
                     //DO NOTHING
                 }
-        }
-        return bot.editMessageText({ chatId, messageId }, `Määränpäät linjalle ${shortName}:\n\n${maaranpaalista}`);
-      })
+            }
+            return bot.editMessageText({ chatId, messageId }, `Määränpäät linjalle ${shortName}:\n\n${maaranpaalista}`);
+        })
 }
 
 //---------- Location ----------
@@ -499,8 +534,6 @@ bot.on(['location'], (msg, self) => {
             }
         })
 });
-
-
 
 //Sovelluksen pyöritys. Älä poista!
 bot.start();
