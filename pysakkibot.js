@@ -23,7 +23,6 @@ const LOCvaaravastaus2 = '[]'
 var lahdot;
 var hetki = "Hetkinen..."
 var hetki2 = "Haetaan aikatauluja..."
-var admins = [81023943,86734737]
 //-----------------------------------------------
 
 // Logaa jokaisen sisääntulevan viestin consoliin
@@ -151,7 +150,7 @@ bot.on('/linja', msg => {
 bot.on('ask.pysakkinimi', msg => {
     let text = msg.text;
 
-    if (text == "/start" || text == undefined || text.includes("/hae") || text == "/help" || text == "/linja" || text == "/menu") {
+    if (text == "/start" || text == undefined || text.includes("/hae") || text == "/help" || text == "/linja" || text == "/menu" || text.includes("/admin")) {
         //Älä tee mitään
     } else {
         console.log("[info] Hetkinen...")
@@ -166,7 +165,7 @@ bot.on('ask.askpysakkivalinta', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" || valinta == "/menu") {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/linja" || valinta == "/menu"|| valinta.includes("/admin")) {
         //Älä tee mitään
     } else {
         if (valinta.includes("/")) {
@@ -187,7 +186,7 @@ bot.on('ask.linjatunnus', msg => {
     const valinta = msg.text;
 
     // Tähän komennot joita jotka ei tee pysäkkihakua
-    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/menu") {
+    if (valinta == "/start" || valinta == "/hide" || valinta == undefined || valinta.includes("/hae") || valinta == "/help" || valinta == "/menu" || valinta.includes("/admin")) {
         //Älä tee mitään
     } else {
 
