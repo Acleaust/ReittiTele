@@ -13,7 +13,7 @@ require('console-stamp')(console, 'HH:MM:ss'); //Aikaleimat logiin
 
 //BotToken
 const bot = new TeleBot({
-    token: 'TOKEN',
+    token: '535551085:AAFSCoJ-h3xoZ0eaZrKazCA5gNpSIgos6_I',
     usePlugins: ['askUser']
 });
 
@@ -57,7 +57,7 @@ bot.on('/bugi', (msg) => {
 // /hide (piilottaa näppäimistön)
 bot.on('/hide', msg => {
     return bot.sendMessage(
-        msg.from.id, 'Vaihtoehdot piilotettu.', { replyMarkup: 'hide' }
+        msg.from.id, 'Näppäimistö piilotettu.', { replyMarkup: 'hide' }
     );
 });
 
@@ -200,6 +200,7 @@ bot.on('ask.askpysakkivalinta', msg => {
     }
 });
 
+//Linjan kysyminen
 bot.on('ask.linjatunnus', msg => {
     const valinta = msg.text;
 
@@ -208,8 +209,8 @@ bot.on('ask.linjatunnus', msg => {
         //Älä tee mitään
     } else {
 
-        console.log("[info] Haetaan määränpäät...")
-        return bot.sendMessage(msg.from.id, 'Haetaan määränpäitä...').then(re => {
+        bot.sendMessage(msg.from.id, 'Haetaan määränpäitä...').then(re => {
+            return console.log("[info] Haetaan määränpäät...")
 
             maaranpaat(msg.from.id, re.message_id, valinta);
         })
@@ -389,6 +390,7 @@ function valintafunktio(chatId, messageId, valinta) {
                 var lahdot = undefined;
             }
         })
+        
         //Jos errori koko höskässä konsoliin errorviesti. Valitettavasti ihan mikä vaa error on GraphQL error mut ei voi mitää
         .catch(err => {
             console.log("[ERROR] GraphQL error")
@@ -420,7 +422,7 @@ function maaranpaat(chatId, messageId, viesti) {
             var desc = jp.query(data, '$..desc')
             var shortNames = jp.query(data, '$..shortName')
             var patterns = jp.query(data, '$..patterns')
-            
+
             //Eritellään kaikki 
             for (i = 0; i < desc.length; i += 1) {
                 //Linjatunnus ja pattterni
