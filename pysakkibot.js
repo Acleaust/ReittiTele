@@ -30,13 +30,13 @@ bot.on('text', function (msg) {
     console.log(`[text] ${msg.chat.id} ${msg.text}`);
 });
 
-//---------- Komentoja ----------
+//---------- Komennot ----------
 
 // /start
 bot.on('/start', (msg) => {
     let replyMarkup = bot.keyboard([
         [bot.button('/hae'), bot.button('location', 'Sijaintisi mukaan 📍')],
-        ['/hide']
+        ['/help']
     ], { resize: true });
     bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään pysäkkibottia!\n\nVoit aloittaa käytön kirjoittamalla /hae ja pysäkin nimen tai koodin.\n\nVoit vaihtoehtoisesti myös lähettää sijaintisi ja saada lähistöltäsi seuraavat lähdöt!\n\nJos tarvitset lisää apua tee /help! 😄`, { replyMarkup }); //Vastaa kun käyttäjä käyttää /start komentoa
     return console.log("[info] Start viesti lähetetty!")
@@ -73,7 +73,6 @@ bot.on('/menu', msg => {
     //Rakentaa näppäimitön
     let replyMarkup = bot.keyboard([
         [bot.button('/hae'), bot.button('location', 'Sijaintisi mukaan 📍')],
-        ['/hide']
     ], { resize: true });
     //Lähettää viestin
     bot.sendMessage(msg.from.id, 'Valitse toiminto.', { replyMarkup });
@@ -86,7 +85,6 @@ bot.on('/admin', (msg) => {
         console.log("[info] Admin tunnistettu")
         let replyMarkup = bot.keyboard([
             ['/adminhairio'],
-            ['/hide']
         ], { resize: true });
         return bot.sendMessage(msg.from.id, `Admin menu:`, { replyMarkup })
     } else {
@@ -271,9 +269,8 @@ function pysakkihaku(chatId, messageId, viesti) {
                 nappaimisto2 = nappaimisto.splice(0, Math.ceil(nappaimisto.length / 2));
                 //Näppäimistön alaosa
                 var nappaimistoAla1 = [bot.button('/hae'), bot.button('location', 'Sijaintisi mukaan 📍')]
-                var nappaimistoAla2 = ['/hide']
                 //Rakennetaan nappaimisto
-                let replyMarkup = bot.keyboard([nappaimisto2, nappaimisto, nappaimistoAla1, nappaimistoAla2], { resize: true });
+                let replyMarkup = bot.keyboard([nappaimisto2, nappaimisto, nappaimistoAla1], { resize: true });
 
                 //Returnaa pysäkit tekstinä ja tyhjentää pysäkkivalinnan
                 console.log("[info] Valinnat lähetetty!")

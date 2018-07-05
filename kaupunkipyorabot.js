@@ -1,10 +1,13 @@
-//Kaupunkipyöräbot
+//
+//  Kaupunkipyöräbot
+//  Created by @AInkilainen & @larma (Telegram usernames)
+//
+
+//NPM
 const TeleBot = require('telebot');
 const { request } = require('graphql-request')
 var jp = require('jsonpath');
-
-//Aikaleimat konsoliin
-require('console-stamp')(console, 'HH:MM:ss');
+require('console-stamp')(console, 'HH:MM:ss'); //Aikaleimat konsoliin
 
 //BotToken
 const bot = new TeleBot({
@@ -30,28 +33,30 @@ bot.on('text', function (msg) {
 //---------- Komennot ----------
 
 bot.on('/start', (msg) => {
-    console.log("[info] Start viesti lähetetty!")
-    return bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään Kaupunkipyöräbottia!\n\nVoit tehdä /asema ja aseman numeron niin saat aseman sijainnin ja asemalla olevine paikkojen ja pyörien lukumäärän.\n\nVoit lähettää minulle sijainnin ja saat lähellä olevat kaupunkipyöräasemat ja saatavalla olevien pyörien määrän! 😃 `); //Vastaa kun käyttäjä käyttää /start komentoa
+    let replyMarkup = bot.keyboard([
+        [bot.button('/asema'), bot.button('location', 'Sijaintisi mukaan 📍')],
+        ['/help']
+    ], { resize: true });
+    bot.sendMessage(msg.from.id, `Hei, ${msg.from.first_name}! Tervetuloa käyttämään Kaupunkipyöräbottia!\n\nVoit tehdä /asema ja aseman numeron niin saat aseman sijainnin ja asemalla olevine paikkojen ja pyörien lukumäärän.\n\nVoit lähettää minulle sijainnin ja saat lähellä olevat kaupunkipyöräasemat ja saatavalla olevien pyörien määrän! 😃 `, { replyMarkup }); //Vastaa kun käyttäjä käyttää /start komentoa
+    return console.log("[info] Start viesti lähetetty!")
 });
 
 bot.on('/help', (msg) => {
-    console.log("[info] Help viesti lähetetty!")
-    return bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoit lähettäää botille sijainnin. Saat vastaukseksi lähimmät asemat ja pyörien saatavuudet.\n\nVoit etsiä tiettyä kaupunkipyöräasemaa tekemällä "/asema" ja kirjoittamalla aseman numeron "019" ja saat aseman tiedot ja sijainnin.\n\nMukavaa matkaa! 😃`); //Vastaa kun käyttäjä käyttää /help komentoa
+    bot.sendMessage(msg.from.id, `${msg.from.first_name} tarvitsetko apua? Tässä lisäohjeita:\n\nVoit lähettäää botille sijainnin. Saat vastaukseksi lähimmät asemat ja pyörien saatavuudet.\n\nVoit etsiä tiettyä kaupunkipyöräasemaa tekemällä "/asema" ja kirjoittamalla aseman numeron "019" ja saat aseman tiedot ja sijainnin.\n\nMukavaa matkaa! 😃`); //Vastaa kun käyttäjä käyttää /help komentoa
+    return console.log("[info] Help viesti lähetetty!")
 });
 
 bot.on('/asema', (msg) => {
     let text = msg.text;
 
     if (text == "/asema") {
-        console.log("[info] Kysytty aseman numeroa.")
-        return bot.sendMessage(msg.from.id, 'Anna aseman numero 😊', { ask: 'asemankoodi' }).then(re => { })
+        bot.sendMessage(msg.from.id, 'Anna aseman numero 😊', { replyMarkup: 'hide', ask: 'asemankoodi' }).then(re => { })
+        return console.log("[info] Kysytty aseman numeroa.")
     } else {
-        console.log("[info] Hetkinen...")
         return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
-
+            console.log("[info] Hetkinen...")
             //Poistaa /asema tekstin viestistä
             text = text.replace('/asema ', '');
-
             //Kutuu funktion
             asemahaku(msg.from.id, re.message_id, text);
         })
@@ -124,8 +129,14 @@ function asemahaku(chatId, messageId, viesti) {
                     var haettuasema = "Asema "+ code + " - " + name + " 🚲\n\nPyöriä saatavilla: " + bikesAvailable + "\nPaikkoja vapaana: " + spacesAvailable;
                 }
             }
+
+            let replyMarkup = bot.keyboard([
+                [bot.button('/asema'), bot.button('location', 'Sijaintisi mukaan 📍')],
+            ], { resize: true });
+
             bot.editMessageText({ chatId, messageId }, `${haettuasema}`);
-            return bot.sendLocation(chatId, [lat, lon])
+            bot.sendLocation(chatId, [lat, lon], { replyMarkup})
+            return
         })
         .catch(err => {
             console.log("[ERROR] GraphQL error")
