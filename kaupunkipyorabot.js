@@ -53,7 +53,7 @@ bot.on('/asema', (msg) => {
         bot.sendMessage(msg.from.id, 'Anna aseman numero 😊', { replyMarkup: 'hide', ask: 'asemankoodi' }).then(re => { })
         return console.log("[info] Kysytty aseman numeroa.")
     } else {
-        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
+        return bot.sendAction(msg.from.id, 'typing').then(re => {
             console.log("[info] Hetkinen...")
             //Poistaa /asema tekstin viestistä
             text = text.replace('/asema ', '');
@@ -72,7 +72,7 @@ bot.on('ask.asemankoodi', msg => {
         //Älä tee mitään
     } else {
         console.log("[info] Hetkinen...")
-        return bot.sendMessage(msg.from.id, 'Hetkinen...').then(re => {
+        return bot.sendAction(msg.from.id, 'typing').then(re => {
 
             asemahaku(msg.from.id, re.message_id, text);
         })
@@ -102,12 +102,12 @@ function asemahaku(chatId, messageId, viesti) {
             var statusif = JSON.stringify(status)
             if (vastaus == wrongasemahaku) {
                 console.log("[info] Asemaa ei löydy")
-                return bot.editMessageText({ chatId, messageId }, `Asemaa ${viesti} ei löydy 😞`);
+                return bot.sendMessage(chatId, `Asemaa ${viesti} ei löydy 😞`);
             } else {
                 if (statusif == '["Station off"]') {
                     var name = jp.query(data, '$..name')
                     console.log("[info] Asema ei ole käytössä.")
-                    return bot.editMessageText({ chatId, messageId }, `Asema ${viesti} - ${name}, ei ole käytössä 😞`);
+                    return bot.sendMessage(chatId, `Asema ${viesti} - ${name}, ei ole käytössä 😞`);
                     //console.log("Hypätty yli!")
                 } else {
                     //Hakee datan
@@ -134,13 +134,13 @@ function asemahaku(chatId, messageId, viesti) {
                 [bot.button('/asema'), bot.button('location', 'Sijaintisi mukaan 📍')],
             ], { resize: true });
 
-            bot.editMessageText({ chatId, messageId }, `${haettuasema}`);
+            bot.sendMessage(chatId, `${haettuasema}`);
             bot.sendLocation(chatId, [lat, lon], { replyMarkup})
             return
         })
         .catch(err => {
             console.log("[ERROR] GraphQL error")
-            return bot.editMessageText({ chatId, messageId }, `Ongelma pyynnössä. Kokeile uudestaan!`)
+            return bot.sendMessage( chatId, `Ongelma pyynnössä. Kokeile uudestaan!`)
         })
 };
 
@@ -155,6 +155,7 @@ bot.on(['location'], (msg, self) => {
     var longitude = jp.query(sijainti, '$..longitude')
 
     console.log(`[location] ${msg.chat.id}`)
+    bot.sendAction(id, 'typing')
 
     //Query
     const citybikelocationquery = `{
