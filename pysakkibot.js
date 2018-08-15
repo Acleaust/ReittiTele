@@ -13,7 +13,7 @@ require('console-stamp')(console, 'HH:MM:ss'); //Aikaleimat logiin
 
 //BotToken
 const bot = new TeleBot({
-    token: '535551085:AAFSCoJ-h3xoZ0eaZrKazCA5gNpSIgos6_I',
+    token: '535551085:AAEAxpsPM_O_926OBRMJlGwPxQ1XQBZGsxo',
     usePlugins: ['askUser']
 });
 
@@ -217,6 +217,11 @@ bot.on('ask.linjatunnus', msg => {
     }
 });
 
+bot.on('ask.linjavalinta', msg => {
+    const valinta = msg.text;
+    console.log(valinta)
+})
+
 //---------- Funktiot ----------
 
 //Pysäkkihaku - /HAE
@@ -405,26 +410,25 @@ function maaranpaat(chatId, messageId, viesti) {
     //Hakulause
     const query = `{
         routes(name: "${viesti}") {
-          id
           shortName
           longName
-          desc
           patterns {
-            id
             headsign
+            code
           }
         }
       }`
-
+    
     return request(digiAPI, query)
         .then(function (data) {
+            var nappaimisto = []
+            var vaihtoehdot = []
             //Datan haku kyselyn vastauksesta
-            var desc = jp.query(data, '$..desc')
             var shortNames = jp.query(data, '$..shortName')
             var patterns = jp.query(data, '$..patterns')
 
             //Eritellään kaikki 
-            for (i = 0; i < desc.length; i += 1) {
+            for (i = 0; i < shortNames.length; i += 1) {
                 //Linjatunnus ja pattterni
                 var linjatunnus = shortNames[i];
                 var pattern = patterns[i];
@@ -433,11 +437,14 @@ function maaranpaat(chatId, messageId, viesti) {
                 if (linjatunnus == viesti) {
                     //Hakee patternista maääränpäät
                     var maaranpaat = jp.query(pattern, '$..headsign')
-                    var iideeahaku = jp.query(pattern, '$..id')
+                    var code = jp.query(pattern, '$..code')
                     //Jokaiselle määränpäälle
                     for (i = 0; i < maaranpaat.length; i += 1) {
                         var maaranpaa = maaranpaat[i]
-                        var iidee = iideeahaku[i]
+
+                        //Lisää dataaa arraylisteihin
+                        nappaimisto.push(maaranpaa)
+                        vaihtoehdot.push(maaranpaa, code)
                         //Määrnänpäät siististi muuttujaan viestiä varten
                         var maaranpaalista
                         if (maaranpaalista == undefined) {
@@ -450,7 +457,17 @@ function maaranpaat(chatId, messageId, viesti) {
                     //DO NOTHING
                 }
             }
-            return bot.editMessageText({ chatId, messageId }, `Määränpäät linjalle ${linjatunnus}:\n\n${maaranpaalista}`);
+            //Näppäimistö jaetaan kahteen riviin
+            nappaimisto2 = nappaimisto.splice(0, Math.ceil(nappaimisto.length / 2));
+            //Näppäimistön alaosa
+            var nappaimistoAla1 = [bot.button('/hae'), bot.button('location', 'Sijaintisi mukaan 📍')]
+            //Rakennetaan nappaimisto
+            let replyMarkup = bot.keyboard([nappaimisto2, nappaimisto, nappaimistoAla1], { resize: true });
+            //console.log(maaranpaalista)
+
+            bot.editMessageText({ chatId, messageId }, `Määränpäät linjalle ${linjatunnus}:\n\n${maaranpaalista}`);
+            bot.sendMessage( chatId, `Valitse määränpää näppäimistä!`, { replyMarkup, ask: 'linjavalinta'} )
+            return console.log("[Info] Määränpäät lähetetty")
         })
 }
 

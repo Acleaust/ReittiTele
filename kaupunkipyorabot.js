@@ -12,16 +12,20 @@ require('console-stamp')(console, 'HH:MM:ss'); //Aikaleimat konsoliin
 //BotToken
 const bot = new TeleBot({
     token: 'TOKEN',
-    usePlugins: ['askUser']
+    usePlugins: ['askUser', 'floodProtection'],
+    pluginConfig: {
+        floodProtection: {
+            interval: 0.7,
+            message: 'Ota iisisti ja relaa 😤'
+        }
+    }
 });
 
 //Muuttujat
 const digiAPI = 'http://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 const LOCvaaravastaus = '{"places":{"edges":[]}}'
 const stationoff = '"Station off"'
-var asemat
 const wrongasemahaku = '{"bikeRentalStation":null}'
-
 
 //-----------------------------------------------
 
@@ -32,6 +36,7 @@ bot.on('text', function (msg) {
 
 //---------- Komennot ----------
 
+// /start
 bot.on('/start', (msg) => {
     let replyMarkup = bot.keyboard([
         [bot.button('/asema'), bot.button('location', 'Sijaintisi mukaan 📍')],
@@ -46,6 +51,7 @@ bot.on('/help', (msg) => {
     return console.log("[info] Help viesti lähetetty!")
 });
 
+// /asema
 bot.on('/asema', (msg) => {
     let text = msg.text;
 
@@ -63,17 +69,27 @@ bot.on('/asema', (msg) => {
     }
 })
 
+// /menu
+bot.on('/menu', msg => {
+    //Rakentaa näppäimitön
+    let replyMarkup = bot.keyboard([
+        [bot.button('/asema'), bot.button('location', 'Sijaintisi mukaan 📍')],
+    ], { resize: true });
+    //Lähettää viestin
+    bot.sendMessage(msg.from.id, 'Valitse toiminto.', { replyMarkup });
+    return console.log("[info] Menu avattu!")
+});
+
 //---------- Kysymykset ---------
 
 bot.on('ask.asemankoodi', msg => {
     let text = msg.text;
 
-    if (text == "/start" || text == undefined || text.includes("/asema") || text == "/help") {
+    if (text == "/start" || text == undefined || text.includes("/asema") || text == "/help" || text == "/menu") {
         //Älä tee mitään
     } else {
         console.log("[info] Hetkinen...")
         return bot.sendAction(msg.from.id, 'typing').then(re => {
-
             asemahaku(msg.from.id, re.message_id, text);
         })
     }
@@ -126,7 +142,7 @@ function asemahaku(chatId, messageId, viesti) {
                     var lon = lon.replace('[', '')
                     var lon = lon.replace(']', '')
 
-                    var haettuasema = "Asema "+ code + " - " + name + " 🚲\n\nPyöriä saatavilla: " + bikesAvailable + "\nPaikkoja vapaana: " + spacesAvailable;
+                    var haettuasema = "Asema " + code + " - " + name + " 🚲\n\nPyöriä saatavilla: " + bikesAvailable + "\nPaikkoja vapaana: " + spacesAvailable;
                 }
             }
 
@@ -135,12 +151,12 @@ function asemahaku(chatId, messageId, viesti) {
             ], { resize: true });
 
             bot.sendMessage(chatId, `${haettuasema}`);
-            bot.sendLocation(chatId, [lat, lon], { replyMarkup})
+            bot.sendLocation(chatId, [lat, lon], { replyMarkup })
             return
         })
         .catch(err => {
             console.log("[ERROR] GraphQL error")
-            return bot.sendMessage( chatId, `Ongelma pyynnössä. Kokeile uudestaan!`)
+            return bot.sendMessage(chatId, `Ongelma pyynnössä. Kokeile uudestaan!`)
         })
 };
 
@@ -148,7 +164,6 @@ function asemahaku(chatId, messageId, viesti) {
 
 bot.on(['location'], (msg, self) => {
     let id = msg.from.id;
-    let text = msg.text;
     let sijainti = msg.location;
 
     var latitude = jp.query(sijainti, '$..latitude')
@@ -210,7 +225,7 @@ bot.on(['location'], (msg, self) => {
                         var spacesAvailable = jp.query(node2, '$..spacesAvailable')
                         var bikesAvailable = jp.query(node2, '$..bikesAvailable')
                         //Yhdistää haetun datan
-                        var yksittainenasema = name + "  " + code + " - "+ distance+ "m"+ "\nPyöriä saatavilla: " + bikesAvailable + "\nPaikkoja vapaana:" + spacesAvailable + "\n\n"
+                        var yksittainenasema = name + "  " + code + " - " + distance + "m" + "\nPyöriä saatavilla: " + bikesAvailable + "\nPaikkoja vapaana:" + spacesAvailable + "\n\n"
                         //Yhdistää asemat 
                         if (asemat == null) {
                             asemat = yksittainenasema;
