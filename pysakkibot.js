@@ -14,7 +14,13 @@ require('console-stamp')(console, 'HH:MM:ss'); //Aikaleimat logiin
 //BotToken
 const bot = new TeleBot({
     token: '535551085:AAEAxpsPM_O_926OBRMJlGwPxQ1XQBZGsxo',
-    usePlugins: ['askUser']
+    usePlugins: ['askUser', 'floodProtection'],
+    pluginConfig: {
+        floodProtection: {
+            interval: 0.8,
+            message: 'Ota iisisti ja relaa 😤'
+        }
+    }
 });
 
 //Muuttujia

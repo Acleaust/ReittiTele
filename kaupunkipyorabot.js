@@ -15,7 +15,7 @@ const bot = new TeleBot({
     usePlugins: ['askUser', 'floodProtection'],
     pluginConfig: {
         floodProtection: {
-            interval: 0.7,
+            interval: 0.8,
             message: 'Ota iisisti ja relaa 😤'
         }
     }
