@@ -13,7 +13,7 @@ require('console-stamp')(console, 'HH:MM:ss'); //Aikaleimat logiin
 
 //BotToken
 const bot = new TeleBot({
-    token: '535551085:AAEAxpsPM_O_926OBRMJlGwPxQ1XQBZGsxo',
+    token: 'TOKEN',
     usePlugins: ['askUser', 'floodProtection'],
     pluginConfig: {
         floodProtection: {
@@ -401,7 +401,7 @@ function valintafunktio(chatId, messageId, valinta) {
                 var lahdot = undefined;
             }
         })
-        
+
         //Jos errori koko höskässä konsoliin errorviesti. Valitettavasti ihan mikä vaa error on GraphQL error mut ei voi mitää
         .catch(err => {
             console.log("[ERROR] GraphQL error")
@@ -424,7 +424,7 @@ function maaranpaat(chatId, messageId, viesti) {
           }
         }
       }`
-    
+
     return request(digiAPI, query)
         .then(function (data) {
             var nappaimisto = []
@@ -472,7 +472,7 @@ function maaranpaat(chatId, messageId, viesti) {
             //console.log(maaranpaalista)
 
             bot.editMessageText({ chatId, messageId }, `Määränpäät linjalle ${linjatunnus}:\n\n${maaranpaalista}`);
-            bot.sendMessage( chatId, `Valitse määränpää näppäimistä!`, { replyMarkup, ask: 'linjavalinta'} )
+            bot.sendMessage(chatId, `Valitse määränpää näppäimistä!`, { replyMarkup, ask: 'linjavalinta' })
             return console.log("[Info] Määränpäät lähetetty")
         })
 }
