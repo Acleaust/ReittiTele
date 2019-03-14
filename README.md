@@ -2,6 +2,8 @@
 
 ## Pysäkkibot
 
+Uusi repo löytyy [täältä!](https://github.com/ainki/pysakkibot)
+
 Telegram botti, jolla saa HSL aikatauluja suoraan telegramiin! Nyt myös kaupunkipyörät!
 
 ###### Pysäkkibot
